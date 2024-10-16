@@ -72,12 +72,12 @@ class ProductController extends TBaseController<ProductModel> {
 
     // If no variations exist, return the simple price or sale price
     if (product.productType == ProductType.single.toString() || product.productVariations!.isEmpty) {
-      return (product.salePrice > 0.0 ? product.salePrice : product.price).toString();
+      return (product.discountpercentage > 0.0 ? product.discountpercentage : product.price).toString();
     } else {
       // Calculate the smallest and largest prices among variations
       for (var variation in product.productVariations!) {
         // Determine the price to consider (sale price if available, otherwise regular price)
-        double priceToConsider = variation.salePrice > 0.0 ? variation.salePrice : variation.price;
+        double priceToConsider = variation.discountpercentage > 0.0 ? variation.discountpercentage : variation.price;
 
         // Update smallest and largest prices
         if (priceToConsider < smallestPrice) {
@@ -100,11 +100,11 @@ class ProductController extends TBaseController<ProductModel> {
   }
 
   /// -- Calculate Discount Percentage
-  String? calculateSalePercentage(double originalPrice, double? salePrice) {
-    if (salePrice == null || salePrice <= 0.0) return null;
+  String? calculateSalePercentage(double originalPrice, double? discountpercentage) {
+    if (discountpercentage == null || discountpercentage <= 0.0) return null;
     if (originalPrice <= 0) return null;
 
-    double percentage = ((originalPrice - salePrice) / originalPrice) * 100;
+    double percentage = ((originalPrice - discountpercentage) / originalPrice) * 100;
     return percentage.toStringAsFixed(0);
   }
 

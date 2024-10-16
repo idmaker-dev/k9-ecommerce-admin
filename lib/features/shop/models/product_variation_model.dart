@@ -6,7 +6,7 @@ class ProductVariationModel {
   Rx<String> image;
   String? description;
   double price;
-  double salePrice;
+  double discountpercentage;
   int stock;
   int soldQuantity;
   Map<String, String> attributeValues;
@@ -17,7 +17,7 @@ class ProductVariationModel {
     String image = '',
     this.description = '',
     this.price = 0.0,
-    this.salePrice = 0.0,
+    this.discountpercentage = 0.0,
     this.stock = 0,
     this.soldQuantity = 0,
     required this.attributeValues,
@@ -33,7 +33,7 @@ class ProductVariationModel {
       'Image': image.value,
       'Description': description,
       'Price': price,
-      'SalePrice': salePrice,
+      'DiscountPercentage': discountpercentage,
       'SKU': sku,
       'Stock': stock,
       'SoldQuantity': soldQuantity,
@@ -52,7 +52,7 @@ class ProductVariationModel {
       description: data['Description'] ?? '',
       stock: data['Stock'] ?? 0,
       soldQuantity: data['SoldQuantity'] ?? 0,
-      salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
+      discountpercentage: double.parse((data['DiscountPercentage'] ?? 0.0).toString()),
       image: data['Image'] ?? '',
       attributeValues: Map<String, String>.from(data['AttributeValues']),
     );

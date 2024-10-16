@@ -12,7 +12,7 @@ class ProductModel {
   double price;
   String title;
   DateTime? date;
-  double salePrice;
+  double discountpercentage;
   String thumbnail;
   bool? isFeatured;
   BrandModel? brand;
@@ -36,7 +36,7 @@ class ProductModel {
     this.brand,
     this.date,
     this.images,
-    this.salePrice = 0.0,
+    this.discountpercentage = 0.0,
     this.isFeatured,
     this.categoryId,
     this.description,
@@ -58,7 +58,7 @@ class ProductModel {
       'Price': price,
       'Images': images ?? [],
       'Thumbnail': thumbnail,
-      'SalePrice': salePrice,
+      'DiscountPercentage': discountpercentage,
       'IsFeatured': isFeatured,
       'CategoryId': categoryId,
       'Brand': brand!.toJson(),
@@ -81,7 +81,7 @@ class ProductModel {
       stock: data['Stock'] ?? 0,
       soldQuantity: data.containsKey('SoldQuantity') ? data['SoldQuantity'] ?? 0 : 0,
       isFeatured: data['IsFeatured'] ?? false,
-      salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
+      discountpercentage: double.parse((data['DiscountPercentage'] ?? 0.0).toString()),
       thumbnail: data['Thumbnail'] ?? '',
       categoryId: data['CategoryId'] ?? '',
       description: data['Description'] ?? '',
@@ -104,7 +104,7 @@ class ProductModel {
       stock: data['Stock'] ?? 0,
       soldQuantity: data.containsKey('SoldQuantity') ? data['SoldQuantity'] ?? 0 : 0,
       isFeatured: data['IsFeatured'] ?? false,
-      salePrice: double.parse((data['SalePrice'] ?? 0.0).toString()),
+      discountpercentage: double.parse((data['DiscountPercentage'] ?? 0.0).toString()),
       thumbnail: data['Thumbnail'] ?? '',
       categoryId: data['CategoryId'] ?? '',
       description: data['Description'] ?? '',

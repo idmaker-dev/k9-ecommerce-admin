@@ -44,7 +44,7 @@ class EditProductController extends GetxController {
   TextEditingController description = TextEditingController();
   TextEditingController stock = TextEditingController();
   TextEditingController price = TextEditingController();
-  TextEditingController salePrice = TextEditingController();
+  TextEditingController discountpercentage = TextEditingController();
   TextEditingController brandTextField = TextEditingController();
 
   // Rx observables for selected brand and categories
@@ -72,7 +72,7 @@ class EditProductController extends GetxController {
       if (product.productType == ProductType.single.toString()) {
         stock.text = product.stock.toString();
         price.text = product.price.toString();
-        salePrice.text = product.salePrice.toString();
+        discountpercentage.text = product.discountpercentage.toString();
       }
 
       // Product Brand
@@ -153,8 +153,8 @@ class EditProductController extends GetxController {
           (element) =>
               element.price.isNaN ||
               element.price < 0 ||
-              element.salePrice.isNaN ||
-              element.salePrice < 0 ||
+              element.discountpercentage.isNaN ||
+              element.discountpercentage < 0 ||
               element.stock.isNaN ||
               element.stock < 0,
         );
@@ -185,7 +185,7 @@ class EditProductController extends GetxController {
       product.stock = int.tryParse(stock.text.trim()) ?? 0;
       product.price = double.tryParse(price.text.trim()) ?? 0;
       product.images = imagesController.additionalProductImagesUrls;
-      product.salePrice = double.tryParse(salePrice.text.trim()) ?? 0;
+      product.discountpercentage = double.tryParse(discountpercentage.text.trim()) ?? 0;
       product.thumbnail = imagesController.selectedThumbnailImageUrl.value ?? '';
       product.productAttributes = ProductAttributesController.instance.productAttributes;
       product.productVariations = variations;
@@ -249,7 +249,7 @@ class EditProductController extends GetxController {
     description.clear();
     stock.clear();
     price.clear();
-    salePrice.clear();
+    discountpercentage.clear();
     brandTextField.clear();
     selectedBrand.value = null;
     selectedCategories.clear();

@@ -116,7 +116,7 @@ class ProductVariations extends StatelessWidget {
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}$')),
                 ],
-                onChanged: (value) => variation.salePrice = double.parse(value),
+                onChanged: (value) => variation.discountpercentage = double.parse(value),
                 controller: variationController.salePriceControllersList[index][variation],
                 decoration: const InputDecoration(labelText: 'Precio con descuento', hintText: 'Precio con hasta 2 decimales'),
               ),

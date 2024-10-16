@@ -109,7 +109,7 @@ class ProductVariations extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 keyboardType: TextInputType.number,
-                onChanged: (value) => variation.salePrice = double.parse(value),
+                onChanged: (value) => variation.discountpercentage = double.parse(value),
                 controller: variationController.salePriceControllersList[index][variation],
                 decoration: const InputDecoration(labelText: 'Precio con descuento', hintText: '\$'),
               ),

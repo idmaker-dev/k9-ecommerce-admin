@@ -49,8 +49,8 @@ class ProductStockAndPricing extends StatelessWidget {
                       // Sale Price
                       Expanded(
                         child: TextFormField(
-                          controller: controller.salePrice,
-                          decoration: const InputDecoration(labelText: 'Precio con descuento', hintText: '\$'),
+                          controller: controller.discountpercentage,
+                          decoration: const InputDecoration(labelText: 'Porcentaje de descuento', hintText: '\$'),
                         ),
                       ),
                     ],

@@ -56,8 +56,8 @@ class ProductStockAndPricing extends StatelessWidget {
                       // Sale Price
                       Expanded(
                         child: TextFormField(
-                          controller: controller.salePrice,
-                          decoration: const InputDecoration(labelText: 'Precio con descuento', hintText: 'Precio con hasta 2 decimales'),
+                          controller: controller.discountpercentage,
+                          decoration: const InputDecoration(labelText: 'Porcentaje de descuento', hintText: 'Precio con hasta 2 decimales'),
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}$')),

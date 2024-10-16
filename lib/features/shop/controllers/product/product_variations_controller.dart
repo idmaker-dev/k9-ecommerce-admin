@@ -43,7 +43,7 @@ class ProductVariationController extends GetxController {
 
       // Sale Price Controllers
       Map<ProductVariationModel, TextEditingController> salePriceControllers = {};
-      salePriceControllers[variation] = TextEditingController(text: variation.salePrice.toString());
+      salePriceControllers[variation] = TextEditingController(text: variation.discountpercentage.toString());
       salePriceControllersList.add(salePriceControllers);
 
       // Description Controllers

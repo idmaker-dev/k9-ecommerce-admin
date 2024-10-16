@@ -37,7 +37,7 @@ class CreateProductController extends GetxController {
   TextEditingController title = TextEditingController();
   TextEditingController stock = TextEditingController();
   TextEditingController price = TextEditingController();
-  TextEditingController salePrice = TextEditingController();
+  TextEditingController discountpercentage = TextEditingController();
   TextEditingController description = TextEditingController();
   TextEditingController brandTextField = TextEditingController();
 
@@ -87,8 +87,8 @@ class CreateProductController extends GetxController {
         final variationCheckFailed = ProductVariationController.instance.productVariations.any((element) =>
             element.price.isNaN ||
             element.price < 0 ||
-            element.salePrice.isNaN ||
-            element.salePrice < 0 ||
+            element.discountpercentage.isNaN ||
+            element.discountpercentage < 0 ||
             element.stock.isNaN ||
             element.stock < 0 ||
             element.image.value.isEmpty);
@@ -125,7 +125,7 @@ class CreateProductController extends GetxController {
         stock: int.tryParse(stock.text.trim()) ?? 0,
         price: double.tryParse(price.text.trim()) ?? 0,
         images: imagesController.additionalProductImagesUrls,
-        salePrice: double.tryParse(salePrice.text.trim()) ?? 0,
+        discountpercentage: double.tryParse(discountpercentage.text.trim()) ?? 0,
         thumbnail: imagesController.selectedThumbnailImageUrl.value ?? '',
         productAttributes: ProductAttributesController.instance.productAttributes,
         date: DateTime.now(),
@@ -173,7 +173,7 @@ class CreateProductController extends GetxController {
     description.clear();
     stock.clear();
     price.clear();
-    salePrice.clear();
+    discountpercentage.clear();
     brandTextField.clear();
     selectedBrand.value = null;
     selectedCategories.clear();
