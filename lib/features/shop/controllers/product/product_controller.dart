@@ -55,6 +55,10 @@ class ProductController extends TBaseController<ProductModel> {
     sortByProperty(sortColumnIndex, ascending, (ProductModel product) => product.price);
   }
 
+  void sortByDiscount(int sortColumnIndex, bool ascending) {
+    sortByProperty(sortColumnIndex, ascending, (ProductModel product) => product.discountpercentage);
+  }
+
   /// Sorting related code
   void sortByStock(int sortColumnIndex, bool ascending) {
     sortByProperty(sortColumnIndex, ascending, (ProductModel product) => product.stock);
@@ -72,12 +76,12 @@ class ProductController extends TBaseController<ProductModel> {
 
     // If no variations exist, return the simple price or sale price
     if (product.productType == ProductType.single.toString() || product.productVariations!.isEmpty) {
-      return (product.discountpercentage > 0.0 ? product.discountpercentage : product.price).toString();
+      return (product.price).toString();
     } else {
       // Calculate the smallest and largest prices among variations
       for (var variation in product.productVariations!) {
         // Determine the price to consider (sale price if available, otherwise regular price)
-        double priceToConsider = variation.discountpercentage > 0.0 ? variation.discountpercentage : variation.price;
+        double priceToConsider = variation.price;
 
         // Update smallest and largest prices
         if (priceToConsider < smallestPrice) {
@@ -86,6 +90,39 @@ class ProductController extends TBaseController<ProductModel> {
 
         if (priceToConsider > largestPrice) {
           largestPrice = priceToConsider;
+        }
+      }
+
+      // If smallest and largest prices are the same, return a single price
+      if (smallestPrice.isEqual(largestPrice)) {
+        return largestPrice.toString();
+      } else {
+        // Otherwise, return a price range
+        return '$smallestPrice - \$$largestPrice';
+      }
+    }
+  }
+
+  String getProductDiscount(ProductModel product) {
+    double smallestPrice = double.infinity;
+    double largestPrice = 0.0;
+
+    // If no variations exist, return the simple price or sale price
+    if (product.productType == ProductType.single.toString() || product.productVariations!.isEmpty) {
+      return (product.discountpercentage).toString();
+    } else {
+      // Calculate the smallest and largest prices among variations
+      for (var variation in product.productVariations!) {
+        // Determine the price to consider (sale price if available, otherwise regular price)
+        double discountToConsider = variation.discountpercentage;
+
+        // Update smallest and largest prices
+        if (discountToConsider < smallestPrice) {
+          smallestPrice = discountToConsider;
+        }
+
+        if (discountToConsider > largestPrice) {
+          largestPrice = discountToConsider;
         }
       }
 

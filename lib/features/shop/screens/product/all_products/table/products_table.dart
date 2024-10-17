@@ -43,6 +43,10 @@ class ProductsTable extends StatelessWidget {
               label: const Text('Precio'),
               onSort: (columnIndex, ascending) => controller.sortByPrice(columnIndex, ascending),
             ),
+            DataColumn2(
+              label: const Text('Descuento'),
+              onSort: (columnIndex, ascending) => controller.sortByDiscount(columnIndex, ascending),
+            ),
             const DataColumn2(label: Text('Fecha')),
             const DataColumn2(label: Text('Acción'), fixedWidth: 100),
           ],

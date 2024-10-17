@@ -5,7 +5,7 @@ class TFormatter {
     date ??= DateTime.now();
     final onlyDate = DateFormat('dd/MM/yyyy').format(date);
     final onlyTime = DateFormat('hh:mm').format(date);
-    return '$onlyDate at $onlyTime';
+    return '$onlyDate - $onlyTime';
   }
 
   static String formatCurrency(double amount) {

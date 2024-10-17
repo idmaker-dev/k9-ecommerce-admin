@@ -64,6 +64,7 @@ class ProductsRows extends DataTableSource {
           ),
         ),
         DataCell(Text('\$${controller.getProductPrice(product)}')),
+        DataCell(Text('${controller.getProductDiscount(product)}%')),
         DataCell(Text(product.formattedDate)),
         DataCell(
           TTableActionButtons(

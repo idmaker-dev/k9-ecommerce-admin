@@ -108,7 +108,7 @@ abstract class TBaseController<T> extends GetxController {
       // Show a confirmation dialog
       Get.defaultDialog(
         title: 'Delete Item',
-        content: const Text('Are you sure you want to delete this item?'),
+        content: const Text('¿Deseas eliminar este registro?'),
         confirm: SizedBox(
           width: 60,
           child: ElevatedButton(
@@ -154,10 +154,10 @@ abstract class TBaseController<T> extends GetxController {
       update();
 
       TFullScreenLoader.stopLoading();
-      TLoaders.successSnackBar(title: 'Item Deleted', message: 'Your Item has been Deleted');
+      TLoaders.successSnackBar(title: 'Eliminar registro', message: 'Tu producto ha sido eliminado');
     } catch (e) {
       TFullScreenLoader.stopLoading();
-      TLoaders.errorSnackBar(title: 'Oh Snap!', message: e.toString());
+      TLoaders.errorSnackBar(title: 'Algo salio mal!', message: e.toString());
     }
   }
 }
