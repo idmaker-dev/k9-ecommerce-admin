@@ -34,6 +34,7 @@ class UserRepository extends GetxController {
   /// Function to fetch user details based on user ID.
   Future<List<UserModel>> getAllUsers() async {
     try {
+      //el orderBy da error y hace que no se carguen los datos por eso cree una V2 para no moverle a este metodo
       final querySnapshot = await _db.collection("Users").where('Role', isNotEqualTo: 'admin').orderBy('FirstName').get();
       return querySnapshot.docs.map((doc) => UserModel.fromSnapshot(doc)).toList();
     } on FirebaseAuthException catch (e) {
@@ -48,6 +49,21 @@ class UserRepository extends GetxController {
     }
   }
 
+  Future<List<UserModel>> getAllUsersV2() async {
+    try {
+      final querySnapshot = await _db.collection("Users").where('Role', isNotEqualTo: 'admin').get();
+      return querySnapshot.docs.map((doc) => UserModel.fromSnapshot(doc)).toList();
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      if (kDebugMode) print('Something Went Wrong: $e');
+      throw 'Something Went Wrong: $e';
+    }
+  }
   /// Function to fetch user details based on user ID.
   Future<UserModel> fetchUserDetails(String id) async {
     try {

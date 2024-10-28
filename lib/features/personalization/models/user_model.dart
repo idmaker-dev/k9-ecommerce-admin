@@ -17,6 +17,7 @@ class UserModel {
   AppRole role;
   DateTime? createdAt;
   DateTime? updatedAt;
+  String? coupon;
   List<OrderModel>? orders;
   List<AddressModel>? addresses;
 
@@ -32,6 +33,7 @@ class UserModel {
     this.role = AppRole.user,
     this.createdAt,
     this.updatedAt,
+    this.coupon
   });
 
   /// Helper methods
@@ -80,6 +82,7 @@ class UserModel {
             : AppRole.user,
         createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() ?? DateTime.now() : DateTime.now(),
         updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() ?? DateTime.now() : DateTime.now(),
+        coupon: data.containsKey('Cupon') ? data['Cupon'] ?? '' : ''
       );
     } else {
       return empty();

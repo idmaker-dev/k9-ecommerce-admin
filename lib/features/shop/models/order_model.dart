@@ -20,7 +20,7 @@ class OrderModel {
   final DateTime? deliveryDate;
   final List<CartItemModel> items;
   final bool billingAddressSameAsShipping;
-
+  final String? coupon;
   OrderModel({
     required this.id,
     this.userId = '',
@@ -36,6 +36,7 @@ class OrderModel {
     this.shippingAddress,
     this.deliveryDate,
     this.billingAddressSameAsShipping = true,
+    this.coupon
   });
 
   String get formattedOrderDate => THelperFunctions.getFormattedDate(orderDate);
@@ -74,6 +75,7 @@ class OrderModel {
       'deliveryDate': deliveryDate,
       'billingAddressSameAsShipping': billingAddressSameAsShipping,
       'items': items.map((item) => item.toJson()).toList(), // Convert CartItemModel to map
+      'coupon': coupon
     };
   }
 
@@ -99,6 +101,7 @@ class OrderModel {
           ? AddressModel.fromMap(data['shippingAddress'] as Map<String, dynamic>)
           : AddressModel.empty(),
       deliveryDate: data.containsKey('deliveryDate') && data['deliveryDate'] != null ? (data['deliveryDate'] as Timestamp).toDate() : null,
+      coupon: data['coupon'],
       items: data.containsKey('items')
           ? (data['items'] as List<dynamic>).map((itemData) => CartItemModel.fromJson(itemData as Map<String, dynamic>)).toList()
           : [],
