@@ -18,7 +18,7 @@ class SettingsDesktopScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Breadcrumbs
-              TBreadcrumbsWithHeading(heading: 'Settings', breadcrumbItems: ['Settings']),
+              TBreadcrumbsWithHeading(heading: 'Configuración', breadcrumbItems: ['Configuración']),
               SizedBox(height: TSizes.spaceBtwSections),
 
               // Body

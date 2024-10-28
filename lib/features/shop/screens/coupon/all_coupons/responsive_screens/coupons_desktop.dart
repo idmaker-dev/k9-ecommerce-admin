@@ -16,6 +16,7 @@ class CouponsDesktopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final customerController = Get.put(CustomerController());
+    final orderController = Get.put(OrderController());
     customerController.fetchItemsV2();
 
     return Scaffold(
@@ -29,7 +30,7 @@ class CouponsDesktopScreen extends StatelessWidget {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: 100.0),
+                  constraints: const BoxConstraints(minHeight: 100.0),
                   child: Padding(
                     padding: const EdgeInsets.all(TSizes.defaultSpace),
                     child: Expanded(
@@ -42,7 +43,7 @@ class CouponsDesktopScreen extends StatelessWidget {
                             breadcrumbItems: ['Cupones'],
                           ),
                           const SizedBox(height: TSizes.spaceBtwSections),
-                          _buildCustomerSection(context, constraints, customerController),
+                          _buildCustomerSection(context, constraints, customerController, orderController),
                           const SizedBox(height: TSizes.spaceBtwSections),
                       
                         ],
@@ -65,7 +66,7 @@ class CouponsDesktopScreen extends StatelessWidget {
     );
   }
 
- Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints, CustomerController controller) {
+ Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints, CustomerController controller, OrderController orderController) {
   return SizedBox(
     width: constraints.maxWidth,
     child: TRoundedContainer(
@@ -86,7 +87,7 @@ class CouponsDesktopScreen extends StatelessWidget {
                     const SizedBox(width: TSizes.spaceBtwItems),
                     SizedBox(
                       width: 200, 
-                      child: _buildUserDropdown(controller),
+                      child: _buildUserDropdown(controller, orderController),
                     ),
                   ],
                 ),
@@ -94,14 +95,14 @@ class CouponsDesktopScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: TSizes.spaceBtwSections),
-          CouponsStatsTable(constraints: constraints, orderController: Get.find<OrderController>()), 
+          CouponsStatsTable(constraints: constraints, orderController: orderController), 
         ],
       ),
     ),
   );
 }
 
-  Widget _buildUserDropdown(CustomerController controller) {
+  Widget _buildUserDropdown(CustomerController controller, OrderController orderController) {
     return DropdownButtonFormField<UserModel>(
         isExpanded: true,
         value: controller.selectedUser.value,

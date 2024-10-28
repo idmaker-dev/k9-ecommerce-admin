@@ -18,7 +18,7 @@ class ProfileDesktopScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Breadcrumbs
-              TBreadcrumbsWithHeading(heading: 'Profile', breadcrumbItems: ['Profile']),
+              TBreadcrumbsWithHeading(heading: 'Perfil', breadcrumbItems: ['Perfil']),
               SizedBox(height: TSizes.spaceBtwSections),
 
               // Body
