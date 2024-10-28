@@ -74,7 +74,7 @@ class TDashboardCard extends StatelessWidget {
                   SizedBox(
                     width: 135,
                     child: Text(
-                      'Compared to Dec 2023',
+                      'En comparación con \ndiciembre 2023',
                       style: Theme.of(context).textTheme.labelMedium,
                       overflow: TextOverflow.ellipsis,
                     ),
