@@ -28,7 +28,15 @@ class TDashboardCard extends StatelessWidget {
   final Color color, headingIconColor, headingIconBgColor;
   final int stats;
   final void Function()? onTap;
-
+  String _calculateMonthPrevius(int number) {
+  List<String> meses = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  
+  int index = (number - 1) % 12;
+  return meses[index < 0 ? 11 : index];
+}
   @override
   Widget build(BuildContext context) {
     return TRoundedContainer(
@@ -74,7 +82,7 @@ class TDashboardCard extends StatelessWidget {
                   SizedBox(
                     width: 135,
                     child: Text(
-                      'En comparación con \ndiciembre 2023',
+                      'En comparación con \n${_calculateMonthPrevius(DateTime.now().month - 1)} ${DateTime.now().year}',
                       style: Theme.of(context).textTheme.labelMedium,
                       overflow: TextOverflow.ellipsis,
                     ),

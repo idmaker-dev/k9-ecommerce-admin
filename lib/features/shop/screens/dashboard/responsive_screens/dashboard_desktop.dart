@@ -10,7 +10,6 @@ import '../../../../../utils/constants/sizes.dart';
 import '../../../controllers/dashboard/dashboard_controller.dart';
 import '../table/data_table.dart';
 import '../widgets/dashboard_card.dart';
-import '../widgets/order_status_graph.dart';
 import '../widgets/weekly_sales.dart';
 
 class DashboardDesktopScreen extends StatelessWidget {
@@ -19,6 +18,22 @@ class DashboardDesktopScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DashboardController());
+      
+    int calculateSalesPercentageChange() {
+      return controller.calculateSalesPercentageChange().toInt();
+    }
+
+    int calculateAverageOrderValuePercentageChange() {
+      return controller.calculateAverageOrderValuePercentageChange().toInt();
+    }
+
+    int calculateOrderCountPercentageChange() {
+      return controller.calculateOrderCountPercentageChange().toInt();
+    }
+
+    IconData getChangeIcon(int value) => value <= 0 ? Iconsax.arrow_down : Iconsax.arrow_up_3;
+    Color getChangeColor(int value) => value <= 0 ? TColors.error : TColors.success;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -38,11 +53,14 @@ class DashboardDesktopScreen extends StatelessWidget {
                         headingIcon: Iconsax.note,
                         headingIconColor: Colors.blue,
                         headingIconBgColor: Colors.blue.withOpacity(0.1),
-                        stats: 25,
+                        stats:  calculateSalesPercentageChange(),
                         context: context,
                         title: 'Total de ventas',
                         subTitle:
-                            '\$${controller.orderController.allItems.fold(0.0, (previousValue, element) => previousValue + element.totalAmount).toStringAsFixed(2)}',
+                            '\$${controller.orderController.allItems.where((x) => x.orderDate.month == DateTime.now().month).fold(0.0, (previousValue, element) => previousValue + element.totalAmount).toStringAsFixed(2)}',
+                         icon: getChangeIcon(calculateSalesPercentageChange()),   
+                         color: getChangeColor(calculateSalesPercentageChange()),
+                         
                       ),
                     ),
                   ),
@@ -53,13 +71,13 @@ class DashboardDesktopScreen extends StatelessWidget {
                         headingIcon: Iconsax.external_drive,
                         headingIconColor: Colors.green,
                         headingIconBgColor: Colors.green.withOpacity(0.1),
-                        stats: 15,
+                        stats: calculateAverageOrderValuePercentageChange(),
                         context: context,
                         title: 'Promedio de pedidos',
                         subTitle:
-                            '\$${(controller.orderController.allItems.fold(0.0, (previousValue, element) => previousValue + element.totalAmount) / controller.orderController.allItems.length).toStringAsFixed(2)}',
-                        icon: Iconsax.arrow_down,
-                        color: TColors.error,
+                            '\$${(controller.orderController.allItems.where((x) => x.orderDate.month == DateTime.now().month).fold(0.0, (previousValue, element) => previousValue + element.totalAmount) / controller.orderController.allItems.length).toStringAsFixed(2)}',
+                        icon: getChangeIcon(calculateAverageOrderValuePercentageChange()),
+                        color: getChangeColor(calculateAverageOrderValuePercentageChange()),
                       ),
                     ),
                   ),
@@ -70,27 +88,30 @@ class DashboardDesktopScreen extends StatelessWidget {
                         headingIcon: Iconsax.box,
                         headingIconColor: Colors.deepPurple,
                         headingIconBgColor: Colors.deepPurple.withOpacity(0.1),
-                        stats: 44,
+                        stats: calculateOrderCountPercentageChange().toInt(),
                         context: context,
                         title: 'Total de pedidos',
-                        subTitle: '\$${controller.orderController.allItems.length}',
+                        subTitle: '${controller.orderController.allItems.where((x) => x.orderDate.month == DateTime.now().month).length}',
+                        icon: getChangeIcon(calculateOrderCountPercentageChange()),
+                        color: getChangeColor(calculateOrderCountPercentageChange()),
+                        
                       ),
                     ),
                   ),
-                  const SizedBox(width: TSizes.spaceBtwItems),
-                  Expanded(
-                    child: Obx(
-                      () => TDashboardCard(
-                        headingIcon: Iconsax.user,
-                        headingIconColor: Colors.deepOrange,
-                        headingIconBgColor: Colors.deepOrange.withOpacity(0.1),
-                        context: context,
-                        title: 'Visitantes',
-                        subTitle: controller.customerController.allItems.length.toString(),
-                        stats: 2,
-                      ),
-                    ),
-                  ),
+                  // const SizedBox(width: TSizes.spaceBtwItems),
+                  // Expanded(
+                  //   child: Obx(
+                  //     () => TDashboardCard(
+                  //       headingIcon: Iconsax.user,
+                  //       headingIconColor: Colors.deepOrange,
+                  //       headingIconBgColor: Colors.deepOrange.withOpacity(0.1),
+                  //       context: context,
+                  //       title: 'Visitantes',
+                  //       subTitle: controller.customerController.allItems.length.toString(),
+                  //       stats: 2,
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
               const SizedBox(height: TSizes.spaceBtwSections),
@@ -133,29 +154,29 @@ class DashboardDesktopScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: TSizes.spaceBtwSections),
-                  Expanded(
-                    child: TRoundedContainer(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              TCircularIcon(
-                                icon: Iconsax.status,
-                                backgroundColor: Colors.amber.withOpacity(0.1),
-                                color: Colors.amber,
-                                size: TSizes.md,
-                              ),
-                              const SizedBox(width: TSizes.spaceBtwItems),
-                              Text('Estatus de pedidos', style: Theme.of(context).textTheme.headlineSmall),
-                            ],
-                          ),
-                          const SizedBox(height: TSizes.spaceBtwSections),
-                          const OrderStatusPieChart(),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: TRoundedContainer(
+                  //     child: Column(
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         Row(
+                  //           children: [
+                  //             TCircularIcon(
+                  //               icon: Iconsax.status,
+                  //               backgroundColor: Colors.amber.withOpacity(0.1),
+                  //               color: Colors.amber,
+                  //               size: TSizes.md,
+                  //             ),
+                  //             const SizedBox(width: TSizes.spaceBtwItems),
+                  //             Text('Estatus de pedidos', style: Theme.of(context).textTheme.headlineSmall),
+                  //           ],
+                  //         ),
+                  //         const SizedBox(height: TSizes.spaceBtwSections),
+                  //         const OrderStatusPieChart(),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ],
@@ -163,5 +184,6 @@ class DashboardDesktopScreen extends StatelessWidget {
         ),
       ),
     );
+
   }
 }

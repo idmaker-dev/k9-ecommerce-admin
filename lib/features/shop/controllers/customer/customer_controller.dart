@@ -15,7 +15,7 @@ class CustomerController extends TBaseController<UserModel> {
   Rxn<UserModel> selectedUser = Rxn<UserModel>();
 
   Future<void> fetchItemsV2() async {
-    final userList = await _customerRepository.getAllUsersV2();
+    final userList = await _customerRepository.getAllUsers();
     if(users.isEmpty){
     users.assignAll(userList);
 
