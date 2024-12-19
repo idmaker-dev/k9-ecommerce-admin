@@ -24,38 +24,35 @@ class CouponsDesktopScreen extends StatelessWidget {
       body: Obx(
         () {
           if (customerController.users.isEmpty) {
-            return _buildLoadingWidget(); 
+            return _buildLoadingWidget();
           }
 
-         return LayoutBuilder(
+          return LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 100.0),
                   child: Padding(
                     padding: const EdgeInsets.all(TSizes.defaultSpace),
-                    child: Expanded(
-                      child: Column(
-                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const TBreadcrumbsWithHeading(
-                            heading: 'Cupones',
-                            breadcrumbItems: ['Cupones'],
-                          ),
-                          const SizedBox(height: TSizes.spaceBtwSections),
-                          _buildCustomerSection(context, constraints, customerController, orderController),
-                          const SizedBox(height: TSizes.spaceBtwSections),
-                      
-                        ],
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const TBreadcrumbsWithHeading(
+                          heading: 'Cupones',
+                          breadcrumbItems: ['Cupones'],
+                        ),
+                        const SizedBox(height: TSizes.spaceBtwSections),
+                        _buildCustomerSection(context, constraints,
+                            customerController, orderController),
+                        const SizedBox(height: TSizes.spaceBtwSections),
+                      ],
                     ),
                   ),
                 ),
               );
             },
           );
-
         },
       ),
     );
@@ -67,8 +64,8 @@ class CouponsDesktopScreen extends StatelessWidget {
     );
   }
 
-  // ...existing code...
-  Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints, CustomerController controller, OrderController orderController) {
+  Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints,
+      CustomerController controller, OrderController orderController) {
     return SizedBox(
       width: constraints.maxWidth,
       child: TRoundedContainer(
@@ -97,22 +94,30 @@ class CouponsDesktopScreen extends StatelessWidget {
                           return Row(
                             children: [
                               Container(
-                                child: orderController.clabe.value != '' ? 
-                                Text('CLABE: ${orderController.clabe.value}') :
-                                Text(''),
+                                child: orderController.clabe.value != ''
+                                    ? Text(
+                                        'CLABE: ${orderController.clabe.value}')
+                                    : Text(''),
                               ),
                               Container(
-                                child: orderController.clabe.value != '' ? IconButton(
-                                  icon: Icon(Icons.copy),
-                                  onPressed: () {
-                                    FlutterClipboard.copy(orderController.clabe.value).then((value) {
-                                      // Show a snackbar or other feedback to the user
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Copied to clipboard')),
-                                      );
-                                    });
-                                  },
-                                ) : Text(''),
+                                child: orderController.clabe.value != ''
+                                    ? IconButton(
+                                        icon: Icon(Icons.copy),
+                                        onPressed: () {
+                                          FlutterClipboard.copy(
+                                                  orderController.clabe.value)
+                                              .then((value) {
+                                            // Show a snackbar or other feedback to the user
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      'Copied to clipboard')),
+                                            );
+                                          });
+                                        },
+                                      )
+                                    : Text(''),
                               ),
                             ],
                           );
@@ -124,31 +129,33 @@ class CouponsDesktopScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: TSizes.spaceBtwSections),
-            CouponsStatsTable(constraints: constraints, orderController: orderController),
+            CouponsStatsTable(
+                constraints: constraints, orderController: orderController),
           ],
         ),
       ),
     );
   }
-// ...existing code...
 
-  Widget _buildUserDropdown(CustomerController controller, OrderController orderController) {
+  Widget _buildUserDropdown(
+      CustomerController controller, OrderController orderController) {
     return DropdownButtonFormField<UserModel>(
-        isExpanded: true,
-        value: controller.selectedUser.value,
-        onChanged: (UserModel? newUser) async {
-          if (newUser != null) {
-            controller.selectedUser.value = newUser;
-            final selectedCoupon = newUser.coupon ?? '';
-            await Get.find<OrderController>().fetchOrdersMyCoupon(selectedCoupon);
-          }
-        },
-        items: controller.users.map((user) {
-          return DropdownMenuItem<UserModel>(
-            value: user,
-            child: Text('${user.firstName} ${user.coupon != "" ? user.coupon : 'Sin cupon' }'),
-          );
-        }).toList(),
-      );
+      isExpanded: true,
+      value: controller.selectedUser.value,
+      onChanged: (UserModel? newUser) async {
+        if (newUser != null) {
+          controller.selectedUser.value = newUser;
+          final selectedCoupon = newUser.coupon ?? '';
+          await Get.find<OrderController>().fetchOrdersMyCoupon(selectedCoupon);
+        }
+      },
+      items: controller.users.map((user) {
+        return DropdownMenuItem<UserModel>(
+          value: user,
+          child: Text(
+              '${user.firstName} ${user.coupon != "" ? user.coupon : 'Sin cupon'}'),
+        );
+      }).toList(),
+    );
   }
 }
