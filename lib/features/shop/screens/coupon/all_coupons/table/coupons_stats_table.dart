@@ -32,7 +32,7 @@ class CouponsStatsTable extends StatelessWidget {
          
           columns: const [
             DataColumn2(label: Text('Pedido ID')),
-            DataColumn2(label: Text('Ganancia')),
+            DataColumn2(label: Text('Bonificación')),
             DataColumn2(label: Text('Fecha')),
           ],
           source: CouponStatsDataSource(orderController.couponStats),

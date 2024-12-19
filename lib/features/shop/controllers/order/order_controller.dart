@@ -1,4 +1,5 @@
 
+import 'package:cwt_ecommerce_admin_panel/data/repositories/user/user_repository.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/models/cart_item_model.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/models/statitics_model.dart';
 import 'package:get/get.dart';
@@ -15,18 +16,21 @@ class OrderController extends TBaseController<OrderModel> {
   RxBool statusLoader = false.obs;
   var orderStatus = OrderStatus.delivered.obs;
   final _orderRepository = Get.put(OrderRepository());
+  final userRepository = UserRepository.instance;
   RxList<StatisticsModel> couponStats = <StatisticsModel>[].obs;
   final RxBool loading = false.obs;
+  final Rx<String> clabe = ''.obs;
 
   @override
   Future<List<OrderModel>> fetchItems() async {
     sortAscending.value = false;
-    return await _orderRepository.getAllOrders();
+    return await _orderRepository.getAllOrders('');
   }
 
 
   Future<void> fetchOrdersMyCoupon(String coupon) async {
     couponStats.value = [];
+    clabe.value = '';
 
     if (coupon.isEmpty) {
        loading.value = false;
@@ -34,11 +38,18 @@ class OrderController extends TBaseController<OrderModel> {
       return;
     };
 
+    var result = await userRepository.fetchUserDetailsByAttribute('Cupon', coupon);
+
+    var bank = await userRepository.fetchBankAccount(result.id ?? '');
+
+    if(bank != null)
+      clabe.value = bank.accountNumber ?? '';
+
     loading.value = true; 
     try {
         couponStats.value = [];
-        final orders = await _orderRepository.getAllOrders();
-        final ordersFilter = orders.where((order) => order.coupon == coupon).toList();
+        final ordersFilter = await _orderRepository.getAllOrders(coupon);
+        //final ordersFilter = orders.where((order) => order.coupon == coupon).toList();
 
         List<StatisticsModel> statisticsList = [];
         for (var item in ordersFilter) {

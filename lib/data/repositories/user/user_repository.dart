@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../features/personalization/models/bank_account_model.dart';
 import '../../../features/personalization/models/user_model.dart';
 import '../../../features/shop/models/order_model.dart';
 import '../../../utils/exceptions/firebase_auth_exceptions.dart';
@@ -68,6 +69,40 @@ class UserRepository extends GetxController {
     } catch (e) {
       if (kDebugMode) print('Something Went Wrong: $e');
       throw 'Something Went Wrong: $e';
+    }
+  }
+
+  Future<UserModel> fetchUserDetailsByAttribute(String attributeName, String attributeValue) async {
+    try {
+      final querySnapshot = await _db.collection("Users")
+          .where(attributeName, isEqualTo: attributeValue)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        return UserModel.fromSnapshot(querySnapshot.docs.first);
+      } else {
+        return UserModel.empty();
+      }
+    } on FirebaseAuthException catch (e) {
+      throw TFirebaseAuthException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      if (kDebugMode) print('Something Went Wrong: $e');
+      throw 'Something Went Wrong: $e';
+    }
+  }
+
+  Future<BankAccountModel?> fetchBankAccount(String userId) async{
+    try{
+
+      final result = await _db.collection('Users').doc(userId).collection('BankAccounts').get();
+      return result.docs.map((documentSnapshot) => BankAccountModel.fromDocumentSnapshot(documentSnapshot)).firstOrNull;
+    }catch(e){
+      print('${e.toString()}');
+      throw 'Something went wrong while fetching Address Information. Try again later';
     }
   }
 
@@ -138,6 +173,8 @@ class UserRepository extends GetxController {
       throw 'Something went wrong. Please try again';
     }
   }
+
+
 
   /// Delete User Data
   Future<void> deleteUser(String id) async {

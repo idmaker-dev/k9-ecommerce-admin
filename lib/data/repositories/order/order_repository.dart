@@ -17,17 +17,23 @@ class OrderRepository extends GetxController {
   /* ---------------------------- FUNCTIONS ---------------------------------*/
 
   // Get all orders related to the current user
-  Future<List<OrderModel>> getAllOrders() async {
+  Future<List<OrderModel>> getAllOrders(String coupon) async {
     try {
-      final result = await _db.collection('Orders').orderBy('orderDate', descending: true).get();
+      final result = await _db.collection('Orders')
+          .where('coupon', isEqualTo: coupon)
+          .orderBy('orderDate', descending: true).get();
       return result.docs.map((documentSnapshot) => OrderModel.fromSnapshot(documentSnapshot)).toList();
     } on FirebaseException catch (e) {
+      print('${e}');
       throw TFirebaseException(e.code).message;
     } on FormatException catch (_) {
+      print('${_}');
       throw const TFormatException();
     } on PlatformException catch (e) {
+      print('${e}');
       throw TPlatformException(e.code).message;
     } catch (e) {
+      print('${e}');
       throw 'Something went wrong. Please try again';
     }
   }

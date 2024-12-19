@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:cwt_ecommerce_admin_panel/common/widgets/breadcrumbs/breadcrumb_with_heading.dart';
 import 'package:cwt_ecommerce_admin_panel/common/widgets/containers/rounded_container.dart';
 import 'package:cwt_ecommerce_admin_panel/common/widgets/loaders/loader_animation.dart';
@@ -66,41 +67,70 @@ class CouponsDesktopScreen extends StatelessWidget {
     );
   }
 
- Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints, CustomerController controller, OrderController orderController) {
-  return SizedBox(
-    width: constraints.maxWidth,
-    child: TRoundedContainer(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Text(
-                      'Cliente',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(width: TSizes.spaceBtwItems),
-                    SizedBox(
-                      width: 200, 
-                      child: _buildUserDropdown(controller, orderController),
-                    ),
-                  ],
+  // ...existing code...
+  Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints, CustomerController controller, OrderController orderController) {
+    return SizedBox(
+      width: constraints.maxWidth,
+      child: TRoundedContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Text(
+                        'Cliente',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(width: TSizes.spaceBtwItems),
+                      SizedBox(
+                        width: 200,
+                        child: _buildUserDropdown(controller, orderController),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Obx(() {
+                          return Row(
+                            children: [
+                              Container(
+                                child: orderController.clabe.value != '' ? 
+                                Text('CLABE: ${orderController.clabe.value}') :
+                                Text(''),
+                              ),
+                              Container(
+                                child: orderController.clabe.value != '' ? IconButton(
+                                  icon: Icon(Icons.copy),
+                                  onPressed: () {
+                                    FlutterClipboard.copy(orderController.clabe.value).then((value) {
+                                      // Show a snackbar or other feedback to the user
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Copied to clipboard')),
+                                      );
+                                    });
+                                  },
+                                ) : Text(''),
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: TSizes.spaceBtwSections),
-          CouponsStatsTable(constraints: constraints, orderController: orderController), 
-        ],
+              ],
+            ),
+            const SizedBox(height: TSizes.spaceBtwSections),
+            CouponsStatsTable(constraints: constraints, orderController: orderController),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+// ...existing code...
 
   Widget _buildUserDropdown(CustomerController controller, OrderController orderController) {
     return DropdownButtonFormField<UserModel>(
