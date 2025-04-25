@@ -1,14 +1,15 @@
 import 'package:cwt_ecommerce_admin_panel/utils/constants/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 
 class THelperFunctions {
-
   static DateTime getStartOfWeek(DateTime date) {
     final int daysUntilMonday = date.weekday - 1;
     final DateTime startOfWeek = date.subtract(Duration(days: daysUntilMonday));
-    return DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day, 0, 0, 0, 0, 0);
+    return DateTime(
+        startOfWeek.year, startOfWeek.month, startOfWeek.day, 0, 0, 0, 0, 0);
   }
 
   static Color getOrderStatusColor(OrderStatus value) {
@@ -24,6 +25,22 @@ class THelperFunctions {
       return Colors.red;
     } else {
       return Colors.grey;
+    }
+  }
+
+  static String getOrderStatusName(OrderStatus value) {
+    if (OrderStatus.pending == value) {
+      return 'Pendiente';
+    } else if (OrderStatus.processing == value) {
+      return 'En proceso';
+    } else if (OrderStatus.shipped == value) {
+      return 'Enviado';
+    } else if (OrderStatus.delivered == value) {
+      return 'Entregado';
+    } else if (OrderStatus.cancelled == value) {
+      return 'Cancelado';
+    } else {
+      return 'Desconocido';
     }
   }
 
@@ -118,8 +135,15 @@ class THelperFunctions {
     return MediaQuery.of(Get.context!).size.width;
   }
 
-  static String getFormattedDate(DateTime date, {String format = 'dd MMM yyyy'}) {
+  static String getFormattedDate(DateTime date,
+      {String format = 'dd MMM yyyy'}) {
     return DateFormat(format).format(date);
+  }
+
+  //fecha formateada con español
+  static String getFormattedDateSpanish(DateTime date,
+      {String format = 'dd MMM yyyy'}) {
+    return DateFormat(format, 'es').format(date);
   }
 
   static List<T> removeDuplicates<T>(List<T> list) {
@@ -129,7 +153,8 @@ class THelperFunctions {
   static List<Widget> wrapWidgets(List<Widget> widgets, int rowSize) {
     final wrappedList = <Widget>[];
     for (var i = 0; i < widgets.length; i += rowSize) {
-      final rowChildren = widgets.sublist(i, i + rowSize > widgets.length ? widgets.length : i + rowSize);
+      final rowChildren = widgets.sublist(
+          i, i + rowSize > widgets.length ? widgets.length : i + rowSize);
       wrappedList.add(Row(children: rowChildren));
     }
     return wrappedList;

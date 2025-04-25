@@ -2,6 +2,7 @@ import 'package:cwt_ecommerce_admin_panel/common/widgets/shimmers/shimmer.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/order/order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../../../../../common/widgets/containers/rounded_container.dart';
 import '../../../../../../utils/constants/enums.dart';
@@ -24,7 +25,8 @@ class OrderInfo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Información del pedido', style: Theme.of(context).textTheme.headlineMedium),
+          Text('Información del pedido',
+              style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: TSizes.spaceBtwSections),
           Row(
             children: [
@@ -33,7 +35,8 @@ class OrderInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Fecha'),
-                    Text(order.formattedOrderDate, style: Theme.of(context).textTheme.bodyLarge),
+                    Text(order.formattedOrderDate,
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ],
                 ),
               ),
@@ -42,7 +45,8 @@ class OrderInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Articulos'),
-                    Text('${order.items.length} Items', style: Theme.of(context).textTheme.bodyLarge),
+                    Text('${order.items.length} Items',
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ],
                 ),
               ),
@@ -54,11 +58,16 @@ class OrderInfo extends StatelessWidget {
                     const Text('Estatus'),
                     Obx(
                       () {
-                        if (controller.statusLoader.value) return const TShimmerEffect(width: double.infinity, height: 55);
+                        if (controller.statusLoader.value)
+                          return const TShimmerEffect(
+                              width: double.infinity, height: 55);
                         return TRoundedContainer(
                           radius: TSizes.cardRadiusSm,
-                          padding: const EdgeInsets.symmetric(horizontal: TSizes.sm, vertical: 0),
-                          backgroundColor: THelperFunctions.getOrderStatusColor(controller.orderStatus.value).withOpacity(0.1),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: TSizes.sm, vertical: 0),
+                          backgroundColor: THelperFunctions.getOrderStatusColor(
+                                  controller.orderStatus.value)
+                              .withOpacity(0.1),
                           child: DropdownButton<OrderStatus>(
                             padding: const EdgeInsets.symmetric(vertical: 0),
                             value: controller.orderStatus.value,
@@ -71,8 +80,11 @@ class OrderInfo extends StatelessWidget {
                               return DropdownMenuItem<OrderStatus>(
                                 value: status,
                                 child: Text(
-                                  status.name.capitalize.toString(),
-                                  style: TextStyle(color: THelperFunctions.getOrderStatusColor(controller.orderStatus.value)),
+                                  THelperFunctions.getOrderStatusName(status),
+                                  style: TextStyle(
+                                      color:
+                                          THelperFunctions.getOrderStatusColor(
+                                              controller.orderStatus.value)),
                                 ),
                               );
                             }).toList(),
@@ -88,7 +100,8 @@ class OrderInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Total'),
-                    Text('\$${order.totalAmount}', style: Theme.of(context).textTheme.bodyLarge),
+                    Text('\$${order.totalAmount}',
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ],
                 ),
               ),

@@ -9,17 +9,18 @@ class CustomerController extends TBaseController<UserModel> {
 
   final _customerRepository = Get.put(UserRepository());
 
-
-
   RxList<UserModel> users = <UserModel>[].obs;
   Rxn<UserModel> selectedUser = Rxn<UserModel>();
 
   Future<void> fetchItemsV2() async {
     final userList = await _customerRepository.getAllUsers();
-    if(users.isEmpty){
-    users.assignAll(userList);
-
+    if (users.isEmpty) {
+      users.assignAll(userList);
     }
+  }
+
+  limpiarUser() {
+    selectedUser.value = null;
   }
 
   @override
@@ -28,7 +29,8 @@ class CustomerController extends TBaseController<UserModel> {
   }
 
   void sortByName(int sortColumnIndex, bool ascending) {
-    sortByProperty(sortColumnIndex, ascending, (UserModel o) => o.fullName.toString().toLowerCase());
+    sortByProperty(sortColumnIndex, ascending,
+        (UserModel o) => o.fullName.toString().toLowerCase());
   }
 
   @override

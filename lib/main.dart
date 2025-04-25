@@ -1,6 +1,7 @@
 import 'package:cwt_ecommerce_admin_panel/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:url_strategy/url_strategy.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -13,6 +14,9 @@ import 'data/repositories/authentication/authentication_repository.dart';
 Future<void> main() async {
   // Ensure that widgets are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize DateTime localization
+  // initializeDateFormatting('es_ES');
 
   // Initialize GetX Local Storage
   await GetStorage.init();

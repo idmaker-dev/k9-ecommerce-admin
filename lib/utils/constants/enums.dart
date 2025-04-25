@@ -15,8 +15,25 @@ enum TextSizes { small, medium, large }
 
 enum ImageType { asset, network, memory, file }
 
-enum MediaCategory { carpetas, banners, marcas, categorias, productos, usuarios }
+enum MediaCategory {
+  carpetas,
+  banners,
+  marcas,
+  categorias,
+  productos,
+  usuarios
+}
 
 enum OrderStatus { pending, processing, shipped, delivered, cancelled }
 
-enum PaymentMethods { paypal, googlePay, applePay, visa, masterCard, creditCard, paystack, razorPay, paytm }
+enum PaymentMethods {
+  paypal,
+  googlePay,
+  applePay,
+  visa,
+  masterCard,
+  creditCard,
+  paystack,
+  razorPay,
+  paytm
+}

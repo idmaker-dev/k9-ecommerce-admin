@@ -3,6 +3,7 @@ import 'package:cwt_ecommerce_admin_panel/common/widgets/breadcrumbs/breadcrumb_
 import 'package:cwt_ecommerce_admin_panel/common/widgets/containers/rounded_container.dart';
 import 'package:cwt_ecommerce_admin_panel/common/widgets/loaders/loader_animation.dart';
 import 'package:cwt_ecommerce_admin_panel/features/personalization/models/user_model.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/coupon/coupon_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/customer/customer_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/order/order_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/coupon/all_coupons/table/coupons_stats_table.dart';
@@ -18,12 +19,14 @@ class CouponsDesktopScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final customerController = Get.put(CustomerController());
     final orderController = Get.put(OrderController());
-    customerController.fetchItemsV2();
+    final couponController = Get.put(CouponController());
+    couponController.fetchItemsV2();
+    // customerController.fetchItemsV2();
 
     return Scaffold(
       body: Obx(
         () {
-          if (customerController.users.isEmpty) {
+          if (couponController.users.isEmpty) {
             return _buildLoadingWidget();
           }
 
@@ -43,8 +46,8 @@ class CouponsDesktopScreen extends StatelessWidget {
                           breadcrumbItems: ['Cupones'],
                         ),
                         const SizedBox(height: TSizes.spaceBtwSections),
-                        _buildCustomerSection(context, constraints,
-                            customerController, orderController),
+                        _buildCustomerSection(
+                            context, constraints, couponController),
                         const SizedBox(height: TSizes.spaceBtwSections),
                       ],
                     ),
@@ -65,7 +68,7 @@ class CouponsDesktopScreen extends StatelessWidget {
   }
 
   Widget _buildCustomerSection(BuildContext context, BoxConstraints constraints,
-      CustomerController controller, OrderController orderController) {
+      CouponController controller) {
     return SizedBox(
       width: constraints.maxWidth,
       child: TRoundedContainer(
@@ -86,43 +89,17 @@ class CouponsDesktopScreen extends StatelessWidget {
                       const SizedBox(width: TSizes.spaceBtwItems),
                       SizedBox(
                         width: 200,
-                        child: _buildUserDropdown(controller, orderController),
+                        child: _buildUserDropdown(controller),
                       ),
                       const SizedBox(width: 20),
-                      Expanded(
-                        child: Obx(() {
-                          return Row(
-                            children: [
-                              Container(
-                                child: orderController.clabe.value != ''
-                                    ? Text(
-                                        'CLABE: ${orderController.clabe.value}')
-                                    : Text(''),
-                              ),
-                              Container(
-                                child: orderController.clabe.value != ''
-                                    ? IconButton(
-                                        icon: Icon(Icons.copy),
-                                        onPressed: () {
-                                          FlutterClipboard.copy(
-                                                  orderController.clabe.value)
-                                              .then((value) {
-                                            // Show a snackbar or other feedback to the user
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Copied to clipboard')),
-                                            );
-                                          });
-                                        },
-                                      )
-                                    : Text(''),
-                              ),
-                            ],
-                          );
-                        }),
+                      //botn de limpiar
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          controller.limpiarUser();
+                        },
                       ),
+                      const SizedBox(width: 20),
                     ],
                   ),
                 ),
@@ -130,15 +107,16 @@ class CouponsDesktopScreen extends StatelessWidget {
             ),
             const SizedBox(height: TSizes.spaceBtwSections),
             CouponsStatsTable(
-                constraints: constraints, orderController: orderController),
+              constraints: constraints,
+              couponController: controller,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserDropdown(
-      CustomerController controller, OrderController orderController) {
+  Widget _buildUserDropdown(CouponController controller) {
     return DropdownButtonFormField<UserModel>(
       isExpanded: true,
       value: controller.selectedUser.value,
@@ -146,7 +124,7 @@ class CouponsDesktopScreen extends StatelessWidget {
         if (newUser != null) {
           controller.selectedUser.value = newUser;
           final selectedCoupon = newUser.coupon ?? '';
-          await Get.find<OrderController>().fetchOrdersMyCoupon(selectedCoupon);
+          await controller.fetchCouponsByUser(newUser.id ?? '');
         }
       },
       items: controller.users.map((user) {

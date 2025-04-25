@@ -43,16 +43,20 @@ class DashboardController extends TBaseController<OrderModel> {
   // Calculate weekly sales
   void _calculateWeeklySales() {
     for (var order in orderController.allItems) {
-      final DateTime orderWeekStart = THelperFunctions.getStartOfWeek(order.orderDate);
+      final DateTime orderWeekStart =
+          THelperFunctions.getStartOfWeek(order.orderDate);
 
       // Check if the order is within the current week
-      if (orderWeekStart.isBefore(DateTime.now()) && orderWeekStart.add(const Duration(days: 7)).isAfter(DateTime.now())) {
-        int index = (order.orderDate.weekday - 1) % 7; // Adjust index based on DateTime weekday representation
+      if (orderWeekStart.isBefore(DateTime.now()) &&
+          orderWeekStart.add(const Duration(days: 7)).isAfter(DateTime.now())) {
+        int index = (order.orderDate.weekday - 1) %
+            7; // Adjust index based on DateTime weekday representation
 
         // Ensure the index is non-negative
         index = index < 0 ? index + 7 : index;
 
-        print('OrderDate: ${order.orderDate}, CurrentWeekDay: $orderWeekStart, Index: $index');
+        print(
+            'OrderDate: ${order.orderDate}, CurrentWeekDay: $orderWeekStart, Index: $index');
 
         weeklySales[index] += order.totalAmount;
       }
@@ -93,21 +97,27 @@ class DashboardController extends TBaseController<OrderModel> {
         return 'Desconocido';
     }
   }
- DateTime _getPreviousMonthDate() {
+
+  DateTime _getPreviousMonthDate() {
     final int currentMonth = DateTime.now().month;
     final int currentYear = DateTime.now().year;
-    return currentMonth == 1 ? DateTime(currentYear - 1, 12) : DateTime(currentYear, currentMonth - 1);
+    return currentMonth == 1
+        ? DateTime(currentYear - 1, 12)
+        : DateTime(currentYear, currentMonth - 1);
   }
 
   double _getMonthlyTotal(DateTime date) {
     return orderController.allItems
-        .where((x) => x.orderDate.month == date.month && x.orderDate.year == date.year)
-        .fold(0.0, (previousValue, element) => previousValue + element.totalAmount);
+        .where((x) =>
+            x.orderDate.month == date.month && x.orderDate.year == date.year)
+        .fold(0.0,
+            (previousValue, element) => previousValue + element.totalAmount);
   }
 
   int _getMonthlyOrderCount(DateTime date) {
     return orderController.allItems
-        .where((x) => x.orderDate.month == date.month && x.orderDate.year == date.year)
+        .where((x) =>
+            x.orderDate.month == date.month && x.orderDate.year == date.year)
         .length;
   }
 
@@ -118,8 +128,8 @@ class DashboardController extends TBaseController<OrderModel> {
     final double currentTotal = _getMonthlyTotal(currentDate);
     final double previousTotal = _getMonthlyTotal(previousMonthDate);
 
-    final double percentageChange = previousTotal == 0 
-        ? (currentTotal > 0 ? 100.0 : 0.0) 
+    final double percentageChange = previousTotal == 0
+        ? (currentTotal > 0 ? 100.0 : 0.0)
         : ((currentTotal - previousTotal) / previousTotal) * 100;
 
     return percentageChange.toInt();
@@ -131,13 +141,15 @@ class DashboardController extends TBaseController<OrderModel> {
 
     final double currentTotal = _getMonthlyTotal(currentDate);
     final int currentCount = _getMonthlyOrderCount(currentDate);
-    final double currentAverage = currentCount > 0 ? currentTotal / currentCount : 0.0;
+    final double currentAverage =
+        currentCount > 0 ? currentTotal / currentCount : 0.0;
 
     final double previousTotal = _getMonthlyTotal(previousMonthDate);
     final int previousCount = _getMonthlyOrderCount(previousMonthDate);
-    final double previousAverage = previousCount > 0 ? previousTotal / previousCount : 0.0;
+    final double previousAverage =
+        previousCount > 0 ? previousTotal / previousCount : 0.0;
 
-    final double percentageChange = previousAverage == 0 
+    final double percentageChange = previousAverage == 0
         ? (currentAverage > 0 ? 100.0 : 0.0)
         : ((currentAverage - previousAverage) / previousAverage) * 100;
 
@@ -151,8 +163,8 @@ class DashboardController extends TBaseController<OrderModel> {
     final int currentCount = _getMonthlyOrderCount(currentDate);
     final int previousCount = _getMonthlyOrderCount(previousMonthDate);
 
-    final double percentageChange = previousCount == 0 
-        ? (currentCount > 0 ? 100.0 : 0.0)  
+    final double percentageChange = previousCount == 0
+        ? (currentCount > 0 ? 100.0 : 0.0)
         : ((currentCount - previousCount) / previousCount) * 100;
 
     return percentageChange;

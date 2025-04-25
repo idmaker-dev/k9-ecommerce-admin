@@ -48,7 +48,10 @@ class TRoundedImage extends StatelessWidget {
       height: height,
       margin: margin != null ? EdgeInsets.all(margin!) : null,
       padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(border: border, color: backgroundColor, borderRadius: BorderRadius.circular(borderRadius)),
+      decoration: BoxDecoration(
+          border: border,
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(borderRadius)),
       child: _buildImageWidget(),
     );
   }
@@ -73,7 +76,9 @@ class TRoundedImage extends StatelessWidget {
 
     // Apply ClipRRect directly to the image widget
     return ClipRRect(
-      borderRadius: applyImageRadius ? BorderRadius.circular(borderRadius) : BorderRadius.zero,
+      borderRadius: applyImageRadius
+          ? BorderRadius.circular(borderRadius)
+          : BorderRadius.zero,
       child: imageWidget,
     );
   }
@@ -82,12 +87,25 @@ class TRoundedImage extends StatelessWidget {
   Widget _buildNetworkImage() {
     if (image != null) {
       // Use CachedNetworkImage for efficient loading and caching of network images // Not working in Web but just for loading
-      return CachedNetworkImage(
+      // return CachedNetworkImage(
+      //   fit: fit,
+      //   color: overlayColor,
+      //   imageUrl: image!,
+      //   errorWidget: (context, url, error) => const Icon(Iconsax.image),
+      //   progressIndicatorBuilder: (context, url, downloadProgress) => TShimmerEffect(width: width, height: height),
+      // );
+      return Image.network(
+        image!,
         fit: fit,
         color: overlayColor,
-        imageUrl: image!,
-        errorWidget: (context, url, error) => const Icon(Iconsax.image),
-        progressIndicatorBuilder: (context, url, downloadProgress) => TShimmerEffect(width: width, height: height),
+        errorBuilder: (context, error, stackTrace) => const Icon(Iconsax.image),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          } else {
+            return TShimmerEffect(width: width, height: height);
+          }
+        },
       );
     } else {
       // Return an empty container if no image is provided
@@ -99,7 +117,8 @@ class TRoundedImage extends StatelessWidget {
   Widget _buildMemoryImage() {
     if (memoryImage != null) {
       // Display image from memory using Image widget
-      return Image(fit: fit, image: MemoryImage(memoryImage!), color: overlayColor);
+      return Image(
+          fit: fit, image: MemoryImage(memoryImage!), color: overlayColor);
     } else {
       // Return an empty container if no image is provided
       return Container();

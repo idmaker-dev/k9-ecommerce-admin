@@ -24,7 +24,8 @@ class OrderTransaction extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Transacciones', style: Theme.of(context).textTheme.headlineMedium),
+          Text('Transacciones',
+              style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: TSizes.spaceBtwSections),
 
           // Adjust as per your needs
@@ -34,14 +35,17 @@ class OrderTransaction extends StatelessWidget {
                 flex: TDeviceUtils.isMobileScreen(context) ? 2 : 1,
                 child: Row(
                   children: [
-                    const TRoundedImage(imageType: ImageType.asset, image: TImages.paypal),
+                    const TRoundedImage(
+                        imageType: ImageType.asset, image: TImages.creditCard),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Pago via ${order.paymentMethod.capitalize}', style: Theme.of(context).textTheme.titleLarge),
+                          Text('Pago via ${order.paymentMethod.capitalize}',
+                              style: Theme.of(context).textTheme.titleLarge),
                           // Adjust your Payment Method Fee if any
-                          Text('${order.paymentMethod.capitalize} fee \$25', style: Theme.of(context).textTheme.labelMedium),
+                          // Text('${order.paymentMethod.capitalize} fee \$25',
+                          //     style: Theme.of(context).textTheme.labelMedium),
                         ],
                       ),
                     )
@@ -52,8 +56,10 @@ class OrderTransaction extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Fecha', style: Theme.of(context).textTheme.labelMedium),
-                    Text('April 21, 2025', style: Theme.of(context).textTheme.bodyLarge),
+                    Text('Fecha',
+                        style: Theme.of(context).textTheme.labelMedium),
+                    Text('${order.formattedOrderDate}',
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ],
                 ),
               ),
@@ -61,8 +67,10 @@ class OrderTransaction extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total', style: Theme.of(context).textTheme.labelMedium),
-                    Text('\$${order.totalAmount}', style: Theme.of(context).textTheme.bodyLarge),
+                    Text('Total',
+                        style: Theme.of(context).textTheme.labelMedium),
+                    Text('\$${order.totalAmount}',
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ],
                 ),
               ),

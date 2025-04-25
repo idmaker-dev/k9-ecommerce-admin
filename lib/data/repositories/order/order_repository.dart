@@ -17,12 +17,40 @@ class OrderRepository extends GetxController {
   /* ---------------------------- FUNCTIONS ---------------------------------*/
 
   // Get all orders related to the current user
+  Future<List<OrderModel>> getAllOrdersWithOutQuery() async {
+    try {
+      final result = await _db
+          .collection('Orders')
+          .orderBy('orderDate', descending: true)
+          .get();
+      return result.docs
+          .map((documentSnapshot) => OrderModel.fromSnapshot(documentSnapshot))
+          .toList();
+    } on FirebaseException catch (e) {
+      print('${e}');
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      print('${_}');
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      print('${e}');
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      print('${e}');
+      throw 'Something went wrong. Please try again';
+    }
+  }
+
   Future<List<OrderModel>> getAllOrders(String coupon) async {
     try {
-      final result = await _db.collection('Orders')
+      final result = await _db
+          .collection('Orders')
           .where('coupon', isEqualTo: coupon)
-          .orderBy('orderDate', descending: true).get();
-      return result.docs.map((documentSnapshot) => OrderModel.fromSnapshot(documentSnapshot)).toList();
+          .orderBy('orderDate', descending: true)
+          .get();
+      return result.docs
+          .map((documentSnapshot) => OrderModel.fromSnapshot(documentSnapshot))
+          .toList();
     } on FirebaseException catch (e) {
       print('${e}');
       throw TFirebaseException(e.code).message;
@@ -54,7 +82,8 @@ class OrderRepository extends GetxController {
   }
 
   // Update a specific value of an order instance
-  Future<void> updateOrderSpecificValue(String orderId, Map<String, dynamic> data) async {
+  Future<void> updateOrderSpecificValue(
+      String orderId, Map<String, dynamic> data) async {
     try {
       await _db.collection('Orders').doc(orderId).update(data);
     } on FirebaseException catch (e) {
@@ -80,6 +109,29 @@ class OrderRepository extends GetxController {
       throw TPlatformException(e.code).message;
     } catch (e) {
       throw 'Something went wrong. Please try again';
+    }
+  }
+
+  // Get a specific order by its ID
+  Future<OrderModel> getOrderById(String orderId) async {
+    try {
+      final result =
+          await _db.collection('Orders').where('id', isEqualTo: orderId).get();
+
+      if (result.docs.isNotEmpty) {
+        return OrderModel.fromSnapshot(result.docs.first);
+      } else {
+        throw 'Order not found';
+      }
+    } on FirebaseException catch (e) {
+      throw TFirebaseException(e.code).message;
+    } on FormatException catch (_) {
+      throw const TFormatException();
+    } on PlatformException catch (e) {
+      throw TPlatformException(e.code).message;
+    } catch (e) {
+      return OrderModel.empty();
+      // throw 'Something went wrong. Please try again';
     }
   }
 }

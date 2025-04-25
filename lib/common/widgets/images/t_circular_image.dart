@@ -39,7 +39,10 @@ class TCircularImage extends StatelessWidget {
       padding: EdgeInsets.all(padding),
       margin: EdgeInsets.all(margin),
       decoration: BoxDecoration(
-        color: backgroundColor ?? (Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white),
+        color: backgroundColor ??
+            (Theme.of(context).brightness == Brightness.dark
+                ? Colors.black
+                : Colors.white),
         borderRadius: BorderRadius.circular(width >= height ? width : height),
       ),
       child: _buildImageWidget(),
@@ -75,12 +78,25 @@ class TCircularImage extends StatelessWidget {
   Widget _buildNetworkImage() {
     if (image != null) {
       // Use CachedNetworkImage for efficient loading and caching of network images // Not working in Web but just for loading
-      return CachedNetworkImage(
+      // return CachedNetworkImage(
+      //   fit: fit,
+      //   color: overlayColor,
+      //   imageUrl: image!,
+      //   errorWidget: (context, url, error) => const Icon(Icons.error),
+      //   progressIndicatorBuilder: (context, url, downloadProgress) => const TShimmerEffect(width: 55, height: 55),
+      // );
+      return Image.network(
+        image!,
         fit: fit,
         color: overlayColor,
-        imageUrl: image!,
-        errorWidget: (context, url, error) => const Icon(Icons.error),
-        progressIndicatorBuilder: (context, url, downloadProgress) => const TShimmerEffect(width: 55, height: 55),
+        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          } else {
+            return const TShimmerEffect(width: 55, height: 55);
+          }
+        },
       );
     } else {
       // Return an empty container if no image is provided
@@ -92,7 +108,8 @@ class TCircularImage extends StatelessWidget {
   Widget _buildMemoryImage() {
     if (memoryImage != null) {
       // Display image from memory using Image widget
-      return Image(fit: fit, image: MemoryImage(memoryImage!), color: overlayColor);
+      return Image(
+          fit: fit, image: MemoryImage(memoryImage!), color: overlayColor);
     } else {
       // Return an empty container if no image is provided
       return Container();

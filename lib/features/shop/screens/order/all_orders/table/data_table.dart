@@ -16,8 +16,12 @@ class OrderTable extends StatelessWidget {
     return Obx(
       () {
         // Orders & Selected Rows are Hidden => Just to update the UI => Obx => [ProductRows]
-        Visibility(visible: false, child: Text(controller.filteredItems.length.toString()));
-        Visibility(visible: false, child: Text(controller.selectedRows.length.toString()));
+        Visibility(
+            visible: false,
+            child: Text(controller.filteredItems.length.toString()));
+        Visibility(
+            visible: false,
+            child: Text(controller.selectedRows.length.toString()));
 
         // Table
         return TPaginatedDataTable(
@@ -26,10 +30,15 @@ class OrderTable extends StatelessWidget {
           sortColumnIndex: controller.sortColumnIndex.value,
           columns: [
             const DataColumn2(label: Text('Pedido ID')),
-            DataColumn2(label: const Text('Fecha'), onSort: (columnIndex, ascending) => controller.sortByDate(columnIndex, ascending)),
+            DataColumn2(
+                label: const Text('Fecha'),
+                onSort: (columnIndex, ascending) =>
+                    controller.sortByDate(columnIndex, ascending)),
             const DataColumn2(label: Text('Articulos')),
-            DataColumn2(label: const Text('Estatus'), fixedWidth: TDeviceUtils.isMobileScreen(context) ? 120 : null),
-            const DataColumn2(label: Text('Cantidad')),
+            DataColumn2(
+                label: const Text('Estatus'),
+                fixedWidth: TDeviceUtils.isMobileScreen(context) ? 120 : null),
+            const DataColumn2(label: Text('Pago')),
             const DataColumn2(label: Text('Acción'), fixedWidth: 100),
           ],
           source: OrderRows(),

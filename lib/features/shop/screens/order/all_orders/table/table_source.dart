@@ -16,15 +16,20 @@ class OrderRows extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     final order = controller.filteredItems[index];
+    print(order.toJson());
     return DataRow2(
       onTap: () => Get.toNamed(TRoutes.orderDetails, arguments: order),
       selected: controller.selectedRows[index],
-      onSelectChanged: (value) => controller.selectedRows[index] = value ?? false,
+      onSelectChanged: (value) =>
+          controller.selectedRows[index] = value ?? false,
       cells: [
         DataCell(
           Text(
             order.id,
-            style: Theme.of(Get.context!).textTheme.bodyLarge!.apply(color: TColors.primary),
+            style: Theme.of(Get.context!)
+                .textTheme
+                .bodyLarge!
+                .apply(color: TColors.primary),
           ),
         ),
         DataCell(Text(order.formattedOrderDate)),
@@ -32,11 +37,14 @@ class OrderRows extends DataTableSource {
         DataCell(
           TRoundedContainer(
             radius: TSizes.cardRadiusSm,
-            padding: const EdgeInsets.symmetric(vertical: TSizes.sm, horizontal: TSizes.md),
-            backgroundColor: THelperFunctions.getOrderStatusColor(order.status).withOpacity(0.1),
+            padding: const EdgeInsets.symmetric(
+                vertical: TSizes.sm, horizontal: TSizes.md),
+            backgroundColor: THelperFunctions.getOrderStatusColor(order.status)
+                .withOpacity(0.1),
             child: Text(
-              order.status.name.capitalize.toString(),
-              style: TextStyle(color: THelperFunctions.getOrderStatusColor(order.status)),
+              THelperFunctions.getOrderStatusName(order.status),
+              style: TextStyle(
+                  color: THelperFunctions.getOrderStatusColor(order.status)),
             ),
           ),
         ),
@@ -45,7 +53,8 @@ class OrderRows extends DataTableSource {
           TTableActionButtons(
             view: true,
             edit: false,
-            onViewPressed: () => Get.toNamed(TRoutes.orderDetails, arguments: order),
+            onViewPressed: () =>
+                Get.toNamed(TRoutes.orderDetails, arguments: order),
             onDeletePressed: () => controller.confirmAndDeleteItem(order),
           ),
         ),
@@ -60,5 +69,6 @@ class OrderRows extends DataTableSource {
   int get rowCount => controller.filteredItems.length;
 
   @override
-  int get selectedRowCount => controller.selectedRows.where((selected) => selected).length;
+  int get selectedRowCount =>
+      controller.selectedRows.where((selected) => selected).length;
 }

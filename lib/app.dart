@@ -10,6 +10,7 @@ import 'utils/constants/colors.dart';
 import 'utils/constants/text_strings.dart';
 import 'utils/device/web_material_scroll.dart';
 import 'utils/theme/theme.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -27,6 +28,14 @@ class App extends StatelessWidget {
       scrollBehavior: MyCustomScrollBehavior(),
       initialRoute: TRoutes.dashboard,
       getPages: TAppRoute.pages,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('es'), // Spanish
+      ],
       unknownRoute: GetPage(
         name: '/page-not-found',
         page: () => const TPageNotFound(
