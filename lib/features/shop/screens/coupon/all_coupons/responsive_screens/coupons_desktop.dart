@@ -117,23 +117,23 @@ class CouponsDesktopScreen extends StatelessWidget {
   }
 
   Widget _buildUserDropdown(CouponController controller) {
-    return DropdownButtonFormField<UserModel>(
-      isExpanded: true,
-      value: controller.selectedUser.value,
-      onChanged: (UserModel? newUser) async {
-        if (newUser != null) {
-          controller.selectedUser.value = newUser;
-          final selectedCoupon = newUser.coupon ?? '';
-          await controller.fetchCouponsByUser(newUser.id ?? '');
-        }
-      },
-      items: controller.users.map((user) {
-        return DropdownMenuItem<UserModel>(
-          value: user,
-          child: Text(
-              '${user.firstName} ${user.coupon != "" ? user.coupon : 'Sin cupon'}'),
-        );
-      }).toList(),
-    );
+    return Obx(() => DropdownButtonFormField<UserModel>(
+          isExpanded: true,
+          value: controller.selectedUser.value,
+          onChanged: (UserModel? newUser) async {
+            if (newUser != null) {
+              controller.selectedUser.value = newUser;
+              final selectedCoupon = newUser.coupon ?? '';
+              await controller.fetchCouponsByUser(newUser.id ?? '');
+            }
+          },
+          items: controller.users.map((user) {
+            return DropdownMenuItem<UserModel>(
+              value: user,
+              child: Text(
+                  '${user.firstName} ${user.coupon != "" ? user.coupon : 'Sin cupon'}'),
+            );
+          }).toList(),
+        ));
   }
 }

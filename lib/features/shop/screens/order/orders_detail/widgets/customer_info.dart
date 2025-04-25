@@ -244,6 +244,15 @@ class OrderCustomer extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleSmall);
                   },
                 ),
+                Obx(
+                  () {
+                    return controller.coupon.value.bonusDeliveredType == 2
+                        ? Text(
+                            'CLABE: ${controller.bankAccount.value.accountNumber}',
+                            style: Theme.of(context).textTheme.titleSmall)
+                        : const SizedBox.shrink();
+                  },
+                ),
                 Obx(() {
                   //Show butto to confirm trnsaction
                   return controller.coupon.value.bonusDeliveredType == 2

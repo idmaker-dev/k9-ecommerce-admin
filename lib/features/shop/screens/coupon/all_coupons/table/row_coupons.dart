@@ -1,4 +1,5 @@
 import 'package:cwt_ecommerce_admin_panel/features/personalization/models/coupon_model.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/coupon/coupon_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/controllers/order/order_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/models/order_model.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/models/statitics_model.dart';
@@ -12,9 +13,8 @@ import 'package:intl/intl.dart';
 
 class CouponStatsDataSource extends DataTableSource {
   final List<Coupon> couponStats;
-  final controller = OrderController.instance;
-
-  final order = OrderController().fetchOrderById('');
+  final orderController = OrderController.instance;
+  final couponController = CouponController.instance;
 
   CouponStatsDataSource(this.couponStats);
 
@@ -22,10 +22,12 @@ class CouponStatsDataSource extends DataTableSource {
   DataRow2? getRow(int index) {
     if (index >= couponStats.length) return null;
     final stat = couponStats[index];
+    // couponController.fetchCouponsByUser('');
     return DataRow2(
         onTap: () {
-          final order =
-              controller.fetchOrderById(stat.orderId ?? '').then((onValue) {
+          final order = orderController
+              .fetchOrderById(stat.orderId ?? '')
+              .then((onValue) {
             Get.toNamed(TRoutes.orderDetails, arguments: onValue);
           });
         },

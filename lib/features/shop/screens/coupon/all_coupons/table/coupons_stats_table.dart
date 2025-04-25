@@ -17,6 +17,7 @@ class CouponsStatsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    couponController.fetchCouponsByUser('');
     return Obx(() {
       if (couponController.loading.value) {
         return const Center(child: TLoaderAnimation());

@@ -27,20 +27,30 @@ class CouponController extends TBaseController<Coupon> {
     print('fetchOrdersMyCoupon $userId');
     couponStats.value = [];
 
-    if (userId.isEmpty) {
-      loading.value = false;
-      couponStats.refresh();
-      return;
-    }
+    // if (userId.isEmpty) {
+    //   loading.value = false;
+    //   couponStats.refresh();
+    //   return;
+    // }
 
     loading.value = true;
     try {
-      var couponStatsResult =
-          await _userRepository.fetchAllCouponByUser(userId);
+      if (userId.isNotEmpty) {
+        print('fetchOrdersMyCoupon 1');
+        var couponStatsResult =
+            await _userRepository.fetchAllCouponByUser(userId);
 
-      print('couponStatsResult $couponStatsResult');
+        print('couponStatsResult $couponStatsResult');
 
-      couponStats.assignAll(couponStatsResult);
+        couponStats.assignAll(couponStatsResult);
+      } else {
+        print('fetchOrdersMyCoupon 2');
+        var couponStatsResult = await _userRepository.fetchAllCoupons();
+
+        print('couponStatsResult $couponStatsResult');
+
+        couponStats.assignAll(couponStatsResult);
+      }
     } catch (e) {
       TLoaders.warningSnackBar(
           title: 'Error', message: 'No se pudieron cargar los datos: $e');

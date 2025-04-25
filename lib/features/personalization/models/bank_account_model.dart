@@ -22,21 +22,29 @@ class BankAccountModel {
     return '$accountHolderName - $bankName \nAccount: $accountNumber';
   }
 
-  Map<String, dynamic> toJson() => {
-    "Id": id,
-    "AccountNumber": accountNumber,
-    "AccountHolderName": accountHolderName,
-    "BankName": bankName
-  };
+  // Empty constructor
+  BankAccountModel.empty()
+      : id = '',
+        accountNumber = null,
+        accountHolderName = null,
+        bankName = null,
+        branchName = null,
+        ifscCode = null;
 
-  factory BankAccountModel.fromDocumentSnapshot(DocumentSnapshot snapshot){
+  Map<String, dynamic> toJson() => {
+        "Id": id,
+        "AccountNumber": accountNumber,
+        "AccountHolderName": accountHolderName,
+        "BankName": bankName
+      };
+
+  factory BankAccountModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
 
     return BankAccountModel(
         id: snapshot.id,
         accountNumber: data["AccountNumber"],
         accountHolderName: data["AccountHolderName"],
-        bankName: data["BankName"]
-    );
+        bankName: data["BankName"]);
   }
 }

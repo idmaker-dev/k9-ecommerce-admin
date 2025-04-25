@@ -1,3 +1,4 @@
+import 'package:cwt_ecommerce_admin_panel/features/personalization/models/bank_account_model.dart';
 import 'package:cwt_ecommerce_admin_panel/features/personalization/models/coupon_model.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/models/order_model.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,7 @@ class OrderDetailController extends GetxController {
   Rx<UserModel> customer = UserModel.empty().obs;
   Rx<Coupon> coupon = Coupon.empty().obs;
   Rx<UserModel> userCoupon = UserModel.empty().obs;
+  Rx<BankAccountModel> bankAccount = BankAccountModel.empty().obs;
 
   /// -- Load customer orders
   Future<void> getCustomerOfCurrentOrder() async {
@@ -43,6 +45,21 @@ class OrderDetailController extends GetxController {
           .fetchCouponByOrderId(order.value.userCouponId!, order.value.id);
 
       coupon.value = result;
+
+      if (coupon.value.bonusDeliveredType == 2) {
+        // Fetch bank account of user coupon
+
+        final bankAccountResult = await UserRepository.instance
+            .fetchBankAccount(order.value.userCouponId!);
+
+        if (bankAccountResult != null) {
+          bankAccount.value = bankAccountResult;
+        } else {
+          bankAccount.value = BankAccountModel.empty();
+        }
+      } else {
+        bankAccount.value = BankAccountModel.empty();
+      }
     } catch (e) {
       print(e.toString());
       // TLoaders.errorSnackBar(title: 'Oh Snap!', message: e.toString());
