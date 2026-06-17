@@ -117,7 +117,7 @@ class LoginController extends GetxController {
       final userRepository = Get.put(UserRepository());
       await userRepository.createUser(
         UserModel(
-          id: AuthenticationRepository.instance.authUser!.uid,
+          id: AuthenticationRepository.instance.getUserID,
           firstName: 'App',
           lastName: 'Admin',
           email: TTexts.adminEmail,

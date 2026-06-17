@@ -18,12 +18,15 @@ class BrandCategoryModel {
     };
   }
 
-  factory BrandCategoryModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory BrandCategoryModel.fromJson(Map<String, dynamic> data, {String? id}) {
     return BrandCategoryModel(
-      id: snapshot.id,
+      id: id ?? data['Id'] ?? data['id'],
       brandId: data['brandId'] as String,
       categoryId: data['categoryId'] as String,
     );
+  }
+
+  factory BrandCategoryModel.fromSnapshot(DocumentSnapshot snapshot) {
+    return BrandCategoryModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, id: snapshot.id);
   }
 }

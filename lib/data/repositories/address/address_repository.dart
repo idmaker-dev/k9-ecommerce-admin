@@ -28,7 +28,7 @@ class AddressRepository extends GetxController {
   Future<void> updateSelectedField(String addressId, bool selected) async {
     try {
       // Get the current user's ID
-      final userId = AuthenticationRepository.instance.authUser!.uid;
+      final userId = AuthenticationRepository.instance.getUserID;
       // Update the selected field for the specified address in Firestore
       await _db.collection('Users').doc(userId).collection('Addresses').doc(addressId).update({'SelectedAddress': selected});
     } catch (e) {
@@ -41,7 +41,7 @@ class AddressRepository extends GetxController {
   Future<String> addAddress(AddressModel address) async {
     try {
       // Get the current user's ID
-      final userId = AuthenticationRepository.instance.authUser!.uid;
+      final userId = AuthenticationRepository.instance.getUserID;
       // Add the address to the user's collection in Firestore
       final currentAddress = await _db.collection('Users').doc(userId).collection('Addresses').add(address.toJson());
       // Return the ID of the newly added address

@@ -30,20 +30,19 @@ class SettingsModel {
     };
   }
 
+  factory SettingsModel.fromJson(Map<String, dynamic> data, {String? id}) {
+    return SettingsModel(
+      id: id ?? data['id']?.toString(),
+      taxRate: (data['taxRate'] as num?)?.toDouble() ?? 0.0,
+      shippingCost: (data['shippingCost'] as num?)?.toDouble() ?? 0.0,
+      freeShippingThreshold: (data['freeShippingThreshold'] as num?)?.toDouble() ?? 0.0,
+      appName: data.containsKey('appName') ? data['appName'] ?? '' : '',
+      appLogo: data.containsKey('appLogo') ? data['appLogo'] ?? '' : '',
+    );
+  }
+
   /// Factory method to create a SettingModel from a Firebase document snapshot.
   factory SettingsModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data() != null) {
-      final data = document.data()!;
-      return SettingsModel(
-        id: document.id,
-        taxRate: (data['taxRate'] as num?)?.toDouble() ?? 0.0,
-        shippingCost: (data['shippingCost'] as num?)?.toDouble() ?? 0.0,
-        freeShippingThreshold: (data['freeShippingThreshold'] as num?)?.toDouble() ?? 0.0,
-        appName: data.containsKey('appName') ? data['appName'] ?? '' : '',
-        appLogo: data.containsKey('appLogo') ? data['appLogo'] ?? '' : '',
-      );
-    } else {
-      return SettingsModel();
-    }
+    return SettingsModel.fromJson(document.data() ?? {}, id: document.id);
   }
 }

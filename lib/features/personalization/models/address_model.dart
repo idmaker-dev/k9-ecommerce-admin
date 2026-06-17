@@ -48,26 +48,20 @@ class AddressModel {
   }
 
   factory AddressModel.fromMap(Map<String, dynamic> data) {
-    return AddressModel(
-      id: data['Id'] as String,
-      name: data['Name'] as String,
-      phoneNumber: data['PhoneNumber'] as String,
-      street: data['Street'] as String,
-      city: data['City'] as String,
-      state: data['State'] as String,
-      postalCode: data['PostalCode'] as String,
-      country: data['Country'] as String,
-      selectedAddress: data['SelectedAddress'] as bool,
-      dateTime: (data['DateTime'] as Timestamp).toDate(),
-    );
+    return AddressModel.fromJson(data);
   }
 
-  // Factory constructor to create an AddressModel from a DocumentSnapshot
-  factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
 
+  factory AddressModel.fromJson(Map<String, dynamic> data, {String? id}) {
     return AddressModel(
-      id: snapshot.id,
+      id: id ?? data['Id']?.toString() ?? data['id']?.toString() ?? '',
       name: data['Name'] ?? '',
       phoneNumber: data['PhoneNumber'] ?? '',
       street: data['Street'] ?? '',
@@ -75,9 +69,14 @@ class AddressModel {
       state: data['State'] ?? '',
       postalCode: data['PostalCode'] ?? '',
       country: data['Country'] ?? '',
-      dateTime: (data['DateTime'] as Timestamp).toDate(),
-      selectedAddress: data['SelectedAddress'] as bool,
+      selectedAddress: data['SelectedAddress'] ?? false,
+      dateTime: _parseDate(data['DateTime']),
     );
+  }
+
+  // Factory constructor to create an AddressModel from a DocumentSnapshot
+  factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot) {
+    return AddressModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, id: snapshot.id);
   }
 
   @override

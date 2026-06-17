@@ -64,29 +64,39 @@ class UserModel {
     };
   }
 
+  static AppRole _roleFromString(String? roleName) {
+    return AppRole.values.firstWhere(
+      (role) => role.name == roleName,
+      orElse: () => AppRole.user,
+    );
+  }
+
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  factory UserModel.fromJson(Map<String, dynamic> data, {String? id}) {
+    return UserModel(
+      id: id ?? data['id']?.toString(),
+      firstName: data.containsKey('FirstName') ? data['FirstName'] ?? '' : '',
+      lastName: data.containsKey('LastName') ? data['LastName'] ?? '' : '',
+      userName: data.containsKey('UserName') ? data['UserName'] ?? '' : '',
+      email: data.containsKey('Email') ? data['Email'] ?? '' : '',
+      phoneNumber: data.containsKey('PhoneNumber') ? data['PhoneNumber'] ?? '' : '',
+      profilePicture: data.containsKey('ProfilePicture') ? data['ProfilePicture'] ?? '' : '',
+      role: _roleFromString(data['Role']?.toString()),
+      createdAt: _parseDate(data['CreatedAt']) ?? DateTime.now(),
+      updatedAt: _parseDate(data['UpdatedAt']) ?? DateTime.now(),
+      coupon: data.containsKey('Cupon') ? data['Cupon'] ?? '' : '',
+    );
+  }
+
   /// Factory method to create a UserModel from a Firebase document snapshot.
   factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data() != null) {
-      final data = document.data()!;
-      return UserModel(
-        id: document.id,
-        firstName: data.containsKey('FirstName') ? data['FirstName'] ?? '' : '',
-        lastName: data.containsKey('LastName') ? data['LastName'] ?? '' : '',
-        userName: data.containsKey('UserName') ? data['UserName'] ?? '' : '',
-        email: data.containsKey('Email') ? data['Email'] ?? '' : '',
-        phoneNumber: data.containsKey('PhoneNumber') ? data['PhoneNumber'] ?? '' : '',
-        profilePicture: data.containsKey('ProfilePicture') ? data['ProfilePicture'] ?? '' : '',
-        role: data.containsKey('Role')
-            ? (data['Role'] ?? AppRole.user) == AppRole.admin.name.toString()
-                ? AppRole.admin
-                : AppRole.user
-            : AppRole.user,
-        createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() ?? DateTime.now() : DateTime.now(),
-        updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() ?? DateTime.now() : DateTime.now(),
-        coupon: data.containsKey('Cupon') ? data['Cupon'] ?? '' : ''
-      );
-    } else {
-      return empty();
-    }
+    return UserModel.fromJson(document.data() ?? {}, id: document.id);
   }
 }

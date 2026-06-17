@@ -1,67 +1,73 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Service class for Firebase Storage operations
+/// Service class for Supabase Storage operations
 class TFirebaseStorageService extends GetxController {
   static TFirebaseStorageService get instance => Get.find();
 
-  final _firebaseStorage = FirebaseStorage.instance;
+  final _storage = Supabase.instance.client.storage;
 
-  /// Uploads image data from assets to Firebase Storage
-  /// Returns a Uint8List containing image data.
+  static const _knownBuckets = {'products', 'categories', 'brands', 'banners', 'users'};
+
+  String _bucketFor(String path) {
+    final first = path.split('/').first;
+    return _knownBuckets.contains(first) ? first : 'products';
+  }
+
+  /// Reads a local asset and returns its bytes.
   Future<Uint8List> getImageDataFromAssets(String path) async {
     try {
       final byteData = await rootBundle.load(path);
-      final imageData = byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-      return imageData;
+      return byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
     } catch (e) {
-      // Handle exceptions gracefully
       throw 'Error loading image data: $e';
     }
   }
 
-  /// Uploads image data to Firebase Storage
-  /// Returns the download URL of the uploaded image.
+  /// Uploads raw bytes to Supabase Storage.
+  /// Returns the public URL of the uploaded image.
   Future<String> uploadImageData(String path, Uint8List image, String name) async {
     try {
-      final ref = _firebaseStorage.ref(path).child(name);
-      await ref.putData(image);
-      final url = await ref.getDownloadURL();
-      return url;
+      final bucket = _bucketFor(path);
+      final objectPath = '$path/$name';
+      await _storage.from(bucket).uploadBinary(
+            objectPath,
+            image,
+            fileOptions: const FileOptions(upsert: true),
+          );
+      return _storage.from(bucket).getPublicUrl(objectPath);
     } catch (e) {
-      // Handle exceptions gracefully
-      if (e is FirebaseException) {
-        throw 'Firebase Exception: ${e.message}';
+      if (e is StorageException) {
+        throw 'Storage Exception: ${e.message}';
       } else if (e is SocketException) {
         throw 'Network Error: ${e.message}';
-      } else if (e is PlatformException) {
-        throw 'Platform Exception: ${e.message}';
       } else {
         throw 'Something went wrong! Please try again.';
       }
     }
   }
 
-  /// Uploads image file to Firebase Storage
-  /// Returns the download URL of the uploaded image.
+  /// Uploads a file to Supabase Storage.
+  /// Returns the public URL of the uploaded image.
   Future<String> uploadImageFile(String path, XFile image) async {
     try {
-      final ref = _firebaseStorage.ref(path).child(image.name);
-      await ref.putFile(File(image.path));
-      final url = await ref.getDownloadURL();
-      return url;
+      final bucket = _bucketFor(path);
+      final objectPath = '$path/${image.name}';
+      await _storage.from(bucket).upload(
+            objectPath,
+            File(image.path),
+            fileOptions: const FileOptions(upsert: true),
+          );
+      return _storage.from(bucket).getPublicUrl(objectPath);
     } catch (e) {
-      // Handle exceptions gracefully
-      if (e is FirebaseException) {
-        throw 'Firebase Exception: ${e.message}';
+      if (e is StorageException) {
+        throw 'Storage Exception: ${e.message}';
       } else if (e is SocketException) {
         throw 'Network Error: ${e.message}';
-      } else if (e is PlatformException) {
-        throw 'Platform Exception: ${e.message}';
       } else {
         throw 'Something went wrong! Please try again.';
       }

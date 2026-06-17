@@ -29,14 +29,18 @@ class BankAccountModel {
     "BankName": bankName
   };
 
-  factory BankAccountModel.fromDocumentSnapshot(DocumentSnapshot snapshot){
-    final data = snapshot.data() as Map<String, dynamic>;
-
+  factory BankAccountModel.fromJson(Map<String, dynamic> data, {String? id}) {
     return BankAccountModel(
-        id: snapshot.id,
-        accountNumber: data["AccountNumber"],
-        accountHolderName: data["AccountHolderName"],
-        bankName: data["BankName"]
+      id: id ?? data['Id']?.toString() ?? data['id']?.toString() ?? '',
+      accountNumber: data['AccountNumber'],
+      accountHolderName: data['AccountHolderName'],
+      bankName: data['BankName'],
+      branchName: data['BranchName'],
+      ifscCode: data['IfscCode'],
     );
+  }
+
+  factory BankAccountModel.fromDocumentSnapshot(DocumentSnapshot snapshot){
+    return BankAccountModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, id: snapshot.id);
   }
 }

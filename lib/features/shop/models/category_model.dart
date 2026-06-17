@@ -28,6 +28,14 @@ class CategoryModel {
   /// Empty Helper Function
   static CategoryModel empty() => CategoryModel(id: '', image: '', name: '', isFeatured: false);
 
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
   /// Convert model to Json structure so that you can store data in Firebase
   toJson() {
     return {
@@ -40,23 +48,20 @@ class CategoryModel {
     };
   }
 
+  factory CategoryModel.fromJson(Map<String, dynamic> data, {String? id}) {
+    return CategoryModel(
+      id: id ?? data['Id'] ?? data['id'] ?? '',
+      name: data['Name'] ?? '',
+      image: data['Image'] ?? '',
+      parentId: data['ParentId'] ?? '',
+      isFeatured: data['IsFeatured'] ?? false,
+      createdAt: _parseDate(data['CreatedAt']),
+      updatedAt: _parseDate(data['UpdatedAt']),
+    );
+  }
+
   /// Map Json oriented document snapshot from Firebase to UserModel
   factory CategoryModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data() != null) {
-      final data = document.data()!;
-
-      // Map JSON Record to the Model
-      return CategoryModel(
-        id: document.id,
-        name: data['Name'] ?? '',
-        image: data['Image'] ?? '',
-        parentId: data['ParentId'] ?? '',
-        isFeatured: data['IsFeatured'] ?? false,
-        createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() : null,
-        updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() : null,
-      );
-    } else {
-      return CategoryModel.empty();
-    }
+    return CategoryModel.fromJson(document.data() ?? {}, id: document.id);
   }
 }

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../../../routes/routes.dart';
 import '../../../utils/exceptions/firebase_auth_exceptions.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
@@ -14,24 +15,30 @@ class AuthenticationRepository extends GetxController {
 
   // Variables
   final _auth = FirebaseAuth.instance;
+  final _supabase = sb.Supabase.instance.client;
+  final bool _useSupabaseAuth = const bool.fromEnvironment('USE_SUPABASE_AUTH', defaultValue: true);
 
   // Get Authenticated User Data
-  User? get authUser => _auth.currentUser;
+  dynamic get authUser => _supabase.auth.currentUser ?? _auth.currentUser;
+
+  String get getUserID => _supabase.auth.currentUser?.id ?? _auth.currentUser?.uid ?? '';
 
   // Get IsAuthenticated User
-  bool get isAuthenticated => _auth.currentUser != null;
+  bool get isAuthenticated => _supabase.auth.currentUser != null || _auth.currentUser != null;
 
   // Called from main.dart on app launch
   @override
   void onReady() {
-    _auth.setPersistence(Persistence.LOCAL);
+    if (!_useSupabaseAuth) {
+      _auth.setPersistence(Persistence.LOCAL);
+    }
     // Redirect to the appropriate screen
     // screenRedirect();
   }
 
   // Function to determine the relevant screen and redirect accordingly.
   void screenRedirect() async {
-    final user = _auth.currentUser;
+    final user = _supabase.auth.currentUser ?? _auth.currentUser;
 
     // If the user is logged in
     if (user != null) {
@@ -45,9 +52,16 @@ class AuthenticationRepository extends GetxController {
   // Email & Password sign-in
 
   // LOGIN
-  Future<UserCredential> loginWithEmailAndPassword(String email, String password) async {
+  Future<dynamic> loginWithEmailAndPassword(String email, String password) async {
     try {
+      if (_useSupabaseAuth) {
+        final response = await _supabase.auth.signInWithPassword(email: email, password: password);
+        if (response.user == null) throw 'No se pudo iniciar sesión con Supabase.';
+        return response;
+      }
       return await _auth.signInWithEmailAndPassword(email: email, password: password);
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -62,9 +76,16 @@ class AuthenticationRepository extends GetxController {
   }
 
   // REGISTER
-  Future<UserCredential> registerWithEmailAndPassword(String email, String password) async {
+  Future<dynamic> registerWithEmailAndPassword(String email, String password) async {
     try {
+      if (_useSupabaseAuth) {
+        final response = await _supabase.auth.signUp(email: email, password: password);
+        if (response.user == null) throw 'No se pudo crear la cuenta en Supabase.';
+        return response;
+      }
       return await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -79,14 +100,23 @@ class AuthenticationRepository extends GetxController {
   }
 
   // REGISTER USER BY ADMIN
-  Future<UserCredential> registerUserByAdmin(String email, String password) async {
+  Future<dynamic> registerUserByAdmin(String email, String password) async {
     try {
+      if (_useSupabaseAuth) {
+        final response = await _supabase.auth.admin.createUser(
+          sb.AdminUserAttributes(email: email, password: password, emailConfirm: true),
+        );
+        if (response.user == null) throw 'No se pudo registrar el usuario desde admin.';
+        return response;
+      }
       FirebaseApp app = await Firebase.initializeApp(name: 'RegisterUser', options: Firebase.app().options);
       UserCredential userCredential =
       await FirebaseAuth.instanceFor(app: app).createUserWithEmailAndPassword(email: email, password: password);
 
       await app.delete();
       return userCredential;
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -103,7 +133,16 @@ class AuthenticationRepository extends GetxController {
   // EMAIL VERIFICATION
   Future<void> sendEmailVerification() async {
     try {
+      if (_useSupabaseAuth) {
+        final email = _supabase.auth.currentUser?.email;
+        if (email != null && email.isNotEmpty) {
+          await _supabase.auth.resend(type: sb.OtpType.signup, email: email);
+        }
+        return;
+      }
       await _auth.currentUser?.sendEmailVerification();
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -120,7 +159,13 @@ class AuthenticationRepository extends GetxController {
   // FORGET PASSWORD
   Future<void> sendPasswordResetEmail(String email) async {
     try {
+      if (_useSupabaseAuth) {
+        await _supabase.auth.resetPasswordForEmail(email);
+        return;
+      }
       await _auth.sendPasswordResetEmail(email: email);
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -137,11 +182,17 @@ class AuthenticationRepository extends GetxController {
   // RE AUTHENTICATE USER
   Future<void> reAuthenticateWithEmailAndPassword(String email, String password) async {
     try {
+      if (_useSupabaseAuth) {
+        await _supabase.auth.signInWithPassword(email: email, password: password);
+        return;
+      }
       // Create a credential
       AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
 
       // ReAuthenticate
       await _auth.currentUser!.reauthenticateWithCredential(credential);
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -159,8 +210,12 @@ class AuthenticationRepository extends GetxController {
   // Logout User
   Future<void> logout() async {
     try {
+      await _supabase.auth.signOut();
       await FirebaseAuth.instance.signOut();
       Get.offAllNamed(TRoutes.login);
+    } on sb.AuthException catch (e) {
+      if (kDebugMode) print(e);
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       if (kDebugMode) print(e);
       throw TFirebaseAuthException(e.code).message;
@@ -184,6 +239,9 @@ class AuthenticationRepository extends GetxController {
     try {
       // await UserRepository.instance.removeUserRecord(_auth.currentUser!.uid);
       await _auth.currentUser?.delete();
+      await _supabase.auth.signOut();
+    } on sb.AuthException catch (e) {
+      throw e.message;
     } on FirebaseAuthException catch (e) {
       throw TFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {

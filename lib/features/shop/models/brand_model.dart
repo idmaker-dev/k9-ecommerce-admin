@@ -29,6 +29,14 @@ class BrandModel {
   /// Empty Helper Function
   static BrandModel empty() => BrandModel(id: '', image: '', name: '');
 
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
   String get formattedDate => TFormatter.formatDate(createdAt);
 
   String get formattedUpdatedAtDate => TFormatter.formatDate(updatedAt);
@@ -47,37 +55,22 @@ class BrandModel {
   }
 
   /// Map Json oriented document snapshot from Firebase to UserModel
-  factory BrandModel.fromJson(Map<String, dynamic> document) {
+  factory BrandModel.fromJson(Map<String, dynamic> document, {String? id}) {
     final data = document;
     if (data.isEmpty) return BrandModel.empty();
     return BrandModel(
-      id: data['Id'] ?? '',
+      id: id ?? data['Id'] ?? data['id'] ?? '',
       name: data['Name'] ?? '',
       image: data['Image'] ?? '',
       isFeatured: data['IsFeatured'] ?? false,
       productsCount: int.parse((data['ProductsCount'] ?? 0).toString()),
-      createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() : null,
-      updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() : null,
+      createdAt: _parseDate(data['CreatedAt']),
+      updatedAt: _parseDate(data['UpdatedAt']),
     );
   }
 
   /// Map Json oriented document snapshot from Firebase to UserModel
   factory BrandModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data() != null) {
-      final data = document.data()!;
-
-      // Map JSON Record to the Model
-      return BrandModel(
-        id: document.id,
-        name: data['Name'] ?? '',
-        image: data['Image'] ?? '',
-        productsCount: data['ProductsCount'] ?? '',
-        isFeatured: data['IsFeatured'] ?? false,
-        createdAt: data.containsKey('CreatedAt') ? data['CreatedAt']?.toDate() : null,
-        updatedAt: data.containsKey('UpdatedAt') ? data['UpdatedAt']?.toDate() : null,
-      );
-    } else {
-      return BrandModel.empty();
-    }
+    return BrandModel.fromJson(document.data() ?? {}, id: document.id);
   }
 }

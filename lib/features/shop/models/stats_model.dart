@@ -23,14 +23,16 @@ class StatusModel {
     };
   }
 
-  /// Factory method to create a StatusModel from a Firebase document snapshot.
-  factory StatusModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
-
+  factory StatusModel.fromJson(Map<String, dynamic> data, {String? id}) {
     return StatusModel(
-      id: snapshot.id,
+      id: id ?? data['id']?.toString() ?? '',
       deviceId: data.containsKey('deviceId') ? data['deviceId'] as String : '',
       noOfVisits: data.containsKey('noOfVisits') ? data['noOfVisits'] as int : 0,
     );
+  }
+
+  /// Factory method to create a StatusModel from a Firebase document snapshot.
+  factory StatusModel.fromSnapshot(DocumentSnapshot snapshot) {
+    return StatusModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, id: snapshot.id);
   }
 }

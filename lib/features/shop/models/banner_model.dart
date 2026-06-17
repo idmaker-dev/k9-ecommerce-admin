@@ -16,13 +16,16 @@ class BannerModel {
     };
   }
 
-  factory BannerModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory BannerModel.fromJson(Map<String, dynamic> data, {String? id}) {
     return BannerModel(
-      id: snapshot.id,
+      id: id,
       imageUrl: data['imageUrl'] ?? '',
       active: data['active'] ?? false,
       targetScreen: data['targetScreen'] ?? '',
     );
+  }
+
+  factory BannerModel.fromSnapshot(DocumentSnapshot snapshot) {
+    return BannerModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, id: snapshot.id);
   }
 }

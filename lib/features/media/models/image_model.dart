@@ -61,27 +61,33 @@ class ImageModel {
     };
   }
 
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
+
+  factory ImageModel.fromJson(Map<String, dynamic> data, {String? id}) {
+    if (data.isEmpty) return ImageModel.empty();
+    return ImageModel(
+      id: id ?? data['id']?.toString() ?? '',
+      url: data['url'] ?? '',
+      folder: data['folder'] ?? '',
+      sizeBytes: data['sizeBytes'] ?? 0,
+      filename: data['filename'] ?? '',
+      fullPath: data['fullPath'] ?? '',
+      createdAt: _parseDate(data['createdAt']),
+      updatedAt: _parseDate(data['updatedAt']),
+      contentType: data['contentType'] ?? '',
+      mediaCategory: data['mediaCategory'] ?? '',
+    );
+  }
+
   /// Convert Firestore Json and Map on Model
   factory ImageModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data() != null) {
-      final data = document.data()!;
-
-      // Map JSON Record to the Model
-      return ImageModel(
-        id: document.id,
-        url: data['url'] ?? '',
-        folder: data['folder'] ?? '',
-        sizeBytes: data['sizeBytes'] ?? 0,
-        filename: data['filename'] ?? '',
-        fullPath: data['fullPath'] ?? '',
-        createdAt: data.containsKey('createdAt') ? data['createdAt']?.toDate() : null,
-        updatedAt: data.containsKey('updatedAt') ? data['updatedAt']?.toDate() : null,
-        contentType: data['contentType'] ?? '',
-        mediaCategory: data['mediaCategory'],
-      );
-    } else {
-      return ImageModel.empty();
-    }
+    return ImageModel.fromJson(document.data() ?? {}, id: document.id);
   }
 
   /// Map Firebase Storage Data

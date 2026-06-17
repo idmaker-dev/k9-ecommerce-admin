@@ -79,20 +79,26 @@ class OrderModel {
     };
   }
 
-  factory OrderModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    return null;
+  }
 
+  factory OrderModel.fromJson(Map<String, dynamic> data, {String? docId}) {
     return OrderModel(
-      docId: snapshot.id,
+      docId: docId ?? data['docId']?.toString() ?? '',
       id: data.containsKey('id') ? data['id'] as String : '',
       userId: data.containsKey('userId') ? data['userId'] as String : '',
-      status: data.containsKey('status') ? OrderStatus.values.firstWhere((e) => e.toString() == data['status']) : OrderStatus.pending,
-      // Default status
-      totalAmount: data.containsKey('totalAmount') ? data['totalAmount'] as double : 0.0,
+      status: data.containsKey('status')
+          ? OrderStatus.values.firstWhere((e) => e.toString() == data['status'], orElse: () => OrderStatus.pending)
+          : OrderStatus.pending,
+      totalAmount: data.containsKey('totalAmount') ? (data['totalAmount'] as num).toDouble() : 0.0,
       shippingCost: data.containsKey('shippingCost') ? (data['shippingCost'] as num).toDouble() : 0.0,
       taxCost: data.containsKey('taxCost') ? (data['taxCost'] as num).toDouble() : 0.0,
-      orderDate: data.containsKey('orderDate') ? (data['orderDate'] as Timestamp).toDate() : DateTime.now(),
-      // Default to current time
+      orderDate: _parseDate(data['orderDate']) ?? DateTime.now(),
       paymentMethod: data.containsKey('paymentMethod') ? data['paymentMethod'] as String : '',
       billingAddressSameAsShipping: data.containsKey('billingAddressSameAsShipping') ? data['billingAddressSameAsShipping'] as bool : true,
       billingAddress:
@@ -100,11 +106,15 @@ class OrderModel {
       shippingAddress: data.containsKey('shippingAddress')
           ? AddressModel.fromMap(data['shippingAddress'] as Map<String, dynamic>)
           : AddressModel.empty(),
-      deliveryDate: data.containsKey('deliveryDate') && data['deliveryDate'] != null ? (data['deliveryDate'] as Timestamp).toDate() : null,
+      deliveryDate: _parseDate(data['deliveryDate']),
       coupon: data['coupon'],
       items: data.containsKey('items')
           ? (data['items'] as List<dynamic>).map((itemData) => CartItemModel.fromJson(itemData as Map<String, dynamic>)).toList()
           : [],
     );
+  }
+
+  factory OrderModel.fromSnapshot(DocumentSnapshot snapshot) {
+    return OrderModel.fromJson(snapshot.data() as Map<String, dynamic>? ?? {}, docId: snapshot.id);
   }
 }

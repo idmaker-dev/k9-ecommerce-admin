@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/supabase/supabase_client.dart';
 
 import '../../../features/shop/models/banner_model.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
@@ -14,9 +15,23 @@ class BannerRepository extends GetxController {
 
   // Firebase Firestore instance
   final _db = FirebaseFirestore.instance;
+  static const String _bannersTable = 'banners';
 
   // Get all banners from Firestore
   Future<List<BannerModel>> getAllBanners() async {
+    try {
+      final result = await supabase.from(_bannersTable).select();
+      final rows = (result as List)
+          .map((e) => flattenRow(Map<String, dynamic>.from(e)))
+          .map((json) => BannerModel.fromJson(json, id: json['id']?.toString()))
+          .toList();
+      if (rows.isNotEmpty) {
+        return rows;
+      }
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       // Query Firestore collection to get all banners
       final snapshot = await _db.collection("Banners").get();
@@ -41,6 +56,13 @@ class BannerRepository extends GetxController {
   // Create a new banner in Firestore
   Future<String> createBanner(BannerModel banner) async {
     try {
+      final response = await supabase.from(_bannersTable).insert({'data': banner.toJson()}).select().single();
+      return response['id'].toString();
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       // Add the banner to the "Banners" collection in Firestore
       final result = await _db.collection("Banners").add(banner.toJson());
       // Return the ID of the newly created banner
@@ -63,6 +85,13 @@ class BannerRepository extends GetxController {
   // Update an existing banner in Firestore
   Future<void> updateBanner(BannerModel banner) async {
     try {
+      await supabase.from(_bannersTable).upsert({'id': banner.id, 'data': banner.toJson()});
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       // Update the banner with the specified ID in Firestore
       await _db.collection("Banners").doc(banner.id).update(banner.toJson());
     } on FirebaseException catch (e) {
@@ -82,6 +111,13 @@ class BannerRepository extends GetxController {
 
   // Delete a banner from Firestore
   Future<void> deleteBanner(String bannerId) async {
+    try {
+      await supabase.from(_bannersTable).delete().eq('id', bannerId);
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       // Delete the banner with the specified ID from Firestore
       await _db.collection("Banners").doc(bannerId).delete();

@@ -2,6 +2,7 @@ import 'package:cwt_ecommerce_admin_panel/features/shop/models/product_category_
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/supabase/supabase_client.dart';
 
 import '../../../features/shop/models/product_model.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
@@ -15,11 +16,20 @@ class ProductRepository extends GetxController {
 
   /// Firestore instance for database interactions.
   final _db = FirebaseFirestore.instance;
+  static const String _productsTable = 'products';
+  static const String _productCategoryTable = 'product_categories';
 
   /* ---------------------------- FUNCTIONS ---------------------------------*/
 
   /// Create product.
   Future<String> createProduct(ProductModel product) async {
+    try {
+      final row = await supabase.from(_productsTable).insert({'data': product.toJson()}).select().single();
+      return row['id'].toString();
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       final result = await _db.collection('Products').add(product.toJson());
       return result.id;
@@ -37,6 +47,17 @@ class ProductRepository extends GetxController {
   /// Create new product category
   Future<String> createProductCategory(ProductCategoryModel productCategory) async {
     try {
+      final row = await supabase.from(_productCategoryTable).insert({
+        'product_id': productCategory.productId,
+        'category_id': productCategory.categoryId,
+        'data': productCategory.toJson(),
+      }).select().single();
+      return row['id'].toString();
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       final result = await _db.collection("ProductCategory").add(productCategory.toJson());
       return result.id;
     } on FirebaseException catch (e) {
@@ -53,6 +74,13 @@ class ProductRepository extends GetxController {
   /// Update product.
   Future<void> updateProduct(ProductModel product) async {
     try {
+      await supabase.from(_productsTable).upsert({'id': product.id, 'data': product.toJson()});
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       await _db.collection('Products').doc(product.id).update(product.toJson());
     } on FirebaseException catch (e) {
       throw TFirebaseException(e.code).message;
@@ -67,6 +95,16 @@ class ProductRepository extends GetxController {
 
   /// Update Product Instance
   Future<void> updateProductSpecificValue(id, Map<String, dynamic> data) async {
+    try {
+      final row = await supabase.from(_productsTable).select('data').eq('id', id).maybeSingle();
+      final current = Map<String, dynamic>.from(row?['data'] ?? {});
+      current.addAll(data);
+      await supabase.from(_productsTable).upsert({'id': id, 'data': current});
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       await _db.collection('Products').doc(id).update(data);
     } on FirebaseException catch (e) {
@@ -83,6 +121,19 @@ class ProductRepository extends GetxController {
   /// Get limited featured products.
   Future<List<ProductModel>> getAllProducts() async {
     try {
+      final rows = await supabase.from(_productsTable).select();
+      final result = (rows as List)
+          .map((e) => flattenRow(Map<String, dynamic>.from(e)))
+          .map((json) => ProductModel.fromJson(json, id: json['id']?.toString()))
+          .toList();
+      if (result.isNotEmpty) {
+        return result;
+      }
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       final snapshot = await _db.collection('Products').get();
       return snapshot.docs.map((querySnapshot) => ProductModel.fromSnapshot(querySnapshot)).toList();
     } on FirebaseException catch (e) {
@@ -97,6 +148,19 @@ class ProductRepository extends GetxController {
   /// Get limited featured products.
   Future<List<ProductCategoryModel>> getProductCategories(String productId) async {
     try {
+      final rows = await supabase.from(_productCategoryTable).select().eq('product_id', productId);
+      final result = (rows as List)
+          .map((e) => flattenRow(Map<String, dynamic>.from(e)))
+          .map((json) => ProductCategoryModel.fromJson(json, id: json['id']?.toString()))
+          .toList();
+      if (result.isNotEmpty) {
+        return result;
+      }
+    } catch (_) {
+      // Fallback during migration.
+    }
+
+    try {
       final snapshot = await _db.collection('ProductCategory').where('productId', isEqualTo: productId).get();
       return snapshot.docs.map((querySnapshot) => ProductCategoryModel.fromSnapshot(querySnapshot)).toList();
     } on FirebaseException catch (e) {
@@ -110,6 +174,13 @@ class ProductRepository extends GetxController {
 
   /// Remove product category
   Future<void> removeProductCategory(String productId, String categoryId) async {
+    try {
+      await supabase.from(_productCategoryTable).delete().eq('product_id', productId).eq('category_id', categoryId);
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       final result =
           await _db.collection("ProductCategory").where('productId', isEqualTo: productId).where('categoryId', isEqualTo: categoryId).get();
@@ -130,6 +201,14 @@ class ProductRepository extends GetxController {
 
   /// Delete product
   Future<void> deleteProduct(ProductModel product) async {
+    try {
+      await supabase.from(_productCategoryTable).delete().eq('product_id', product.id);
+      await supabase.from(_productsTable).delete().eq('id', product.id);
+      return;
+    } catch (_) {
+      // Fallback during migration.
+    }
+
     try {
       // Delete all data at once from Firebase Firestore
       await _db.runTransaction((transaction) async {
