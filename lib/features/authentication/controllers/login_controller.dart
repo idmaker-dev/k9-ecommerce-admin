@@ -83,14 +83,21 @@ class LoginController extends GetxController {
       // Remove Loader
       TFullScreenLoader.stopLoading();
 
-      // If user is not admin, logout and return
-      if (user.role != AppRole.admin) {
+      // Operadores y administradores de empresa pueden acceder al panel.
+      final allowedRoles = {AppRole.admin, AppRole.companyAdmin};
+      if (!allowedRoles.contains(user.role)) {
+        // Mostrar el mensaje ANTES de navegar: si no, logout() destruye el overlay
+        // del snackbar y el usuario percibe un rebote silencioso al login.
+        TLoaders.errorSnackBar(
+          title: 'Acceso no autorizado',
+          message: 'Esta cuenta no tiene permisos para el panel. Si crees que es un error, contacta al administrador.',
+        );
         await AuthenticationRepository.instance.logout();
-        TLoaders.errorSnackBar(title: 'Not Authorized', message: 'You are not authorized or do have access. Contact Admin');
-      } else {
-        // Redirect
-        AuthenticationRepository.instance.screenRedirect();
+        return;
       }
+
+      // Redirect
+      AuthenticationRepository.instance.screenRedirect();
     } catch (e) {
       TFullScreenLoader.stopLoading();
       TLoaders.errorSnackBar(title: 'Oh Snap', message: e.toString());

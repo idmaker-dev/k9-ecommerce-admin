@@ -15,6 +15,7 @@ class UserModel {
   String phoneNumber;
   String profilePicture;
   AppRole role;
+  String? companyId;
   DateTime? createdAt;
   DateTime? updatedAt;
   String? coupon;
@@ -31,6 +32,7 @@ class UserModel {
     this.phoneNumber = '',
     this.profilePicture = '',
     this.role = AppRole.user,
+    this.companyId,
     this.createdAt,
     this.updatedAt,
     this.coupon
@@ -58,17 +60,11 @@ class UserModel {
       'Email': email,
       'PhoneNumber': phoneNumber,
       'ProfilePicture': profilePicture,
-      'Role': role.name.toString(),
+      'Role': role.dbValue,
+      'CompanyId': companyId,
       'CreatedAt': createdAt,
       'UpdatedAt': updatedAt = DateTime.now(),
     };
-  }
-
-  static AppRole _roleFromString(String? roleName) {
-    return AppRole.values.firstWhere(
-      (role) => role.name == roleName,
-      orElse: () => AppRole.user,
-    );
   }
 
   static DateTime? _parseDate(dynamic value) {
@@ -88,7 +84,8 @@ class UserModel {
       email: data.containsKey('Email') ? data['Email'] ?? '' : '',
       phoneNumber: data.containsKey('PhoneNumber') ? data['PhoneNumber'] ?? '' : '',
       profilePicture: data.containsKey('ProfilePicture') ? data['ProfilePicture'] ?? '' : '',
-      role: _roleFromString(data['Role']?.toString()),
+      role: AppRoleX.fromDb(data['Role'] as String?),
+      companyId: data['CompanyId'] as String?,
       createdAt: _parseDate(data['CreatedAt']) ?? DateTime.now(),
       updatedAt: _parseDate(data['UpdatedAt']) ?? DateTime.now(),
       coupon: data.containsKey('Cupon') ? data['Cupon'] ?? '' : '',

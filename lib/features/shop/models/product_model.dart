@@ -17,6 +17,7 @@ class ProductModel {
   bool? isFeatured;
   BrandModel? brand;
   String? categoryId;
+  String? companyId;
   String productType;
   String? description;
   List<String>? images;
@@ -39,6 +40,7 @@ class ProductModel {
     this.discountpercentage = 0.0,
     this.isFeatured,
     this.categoryId,
+    this.companyId,
     this.description,
     this.productAttributes,
     this.productVariations,
@@ -61,6 +63,7 @@ class ProductModel {
       'DiscountPercentage': discountpercentage,
       'IsFeatured': isFeatured,
       'CategoryId': categoryId,
+      'CompanyId': companyId,
       'Brand': brand!.toJson(),
       'Description': description,
       'ProductType': productType,
@@ -83,6 +86,7 @@ class ProductModel {
       discountpercentage: double.parse((data['DiscountPercentage'] ?? 0.0).toString()),
       thumbnail: data['Thumbnail'] ?? '',
       categoryId: data['CategoryId'] ?? '',
+      companyId: data['CompanyId'],
       description: data['Description'] ?? '',
       productType: data['ProductType'] ?? '',
       brand: data['Brand'] != null ? BrandModel.fromJson(data['Brand']) : null,

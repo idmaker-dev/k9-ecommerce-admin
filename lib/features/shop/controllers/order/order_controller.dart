@@ -14,7 +14,7 @@ class OrderController extends TBaseController<OrderModel> {
   static OrderController get instance => Get.find();
 
   RxBool statusLoader = false.obs;
-  var orderStatus = OrderStatus.delivered.obs;
+  var orderStatus = FulfillmentStatus.delivered.obs;
   final _orderRepository = Get.put(OrderRepository());
   final userRepository = UserRepository.instance;
   RxList<StatisticsModel> couponStats = <StatisticsModel>[].obs;
@@ -90,11 +90,11 @@ class OrderController extends TBaseController<OrderModel> {
   }
 
   /// Update Product Status
-  Future<void> updateOrderStatus(OrderModel order, OrderStatus newStatus) async {
+  Future<void> updateOrderStatus(OrderModel order, FulfillmentStatus newStatus) async {
     try {
       statusLoader.value = true;
-      order.status = newStatus;
-      await _orderRepository.updateOrderSpecificValue(order.docId, {'status': newStatus.toString()});
+      order.fulfillmentStatus = newStatus;
+      await _orderRepository.updateFulfillmentStatus(order.id, newStatus);
       updateItemFromLists(order);
       orderStatus.value = newStatus;
       TLoaders.successSnackBar(title: 'Actualizar', message: 'Estado del pedido actualizado');

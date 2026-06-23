@@ -35,7 +35,7 @@ class OrderRows extends DataTableSource {
             padding: const EdgeInsets.symmetric(vertical: TSizes.sm, horizontal: TSizes.md),
             backgroundColor: THelperFunctions.getOrderStatusColor(order.status).withOpacity(0.1),
             child: Text(
-              order.status.name.capitalize.toString(),
+              '${order.fulfillmentStatus.name.capitalize} / ${order.paymentStatus.name.capitalize}',
               style: TextStyle(color: THelperFunctions.getOrderStatusColor(order.status)),
             ),
           ),

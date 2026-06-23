@@ -9,6 +9,7 @@ class OrderModel {
   final String id;
   final String docId;
   final String userId;
+  final String? companyId;
   OrderStatus status;
   final double totalAmount;
   final double shippingCost;
@@ -21,10 +22,21 @@ class OrderModel {
   final List<CartItemModel> items;
   final bool billingAddressSameAsShipping;
   final String? coupon;
+  final double? subtotal;
+  final double? discountAmount;
+  final double? rewardAmount;
+  final double? total;
+  final PaymentStatus paymentStatus;
+  FulfillmentStatus fulfillmentStatus;
+  final double? commissionRate;
+  final double? commissionAmount;
+  final double? companyAmount;
+  final String? settlementId;
   OrderModel({
     required this.id,
     this.userId = '',
     this.docId = '',
+    this.companyId,
     required this.status,
     required this.items,
     required this.totalAmount,
@@ -36,7 +48,17 @@ class OrderModel {
     this.shippingAddress,
     this.deliveryDate,
     this.billingAddressSameAsShipping = true,
-    this.coupon
+    this.coupon,
+    this.subtotal,
+    this.discountAmount,
+    this.rewardAmount,
+    this.total,
+    this.paymentStatus = PaymentStatus.pending,
+    this.fulfillmentStatus = FulfillmentStatus.pending,
+    this.commissionRate,
+    this.commissionAmount,
+    this.companyAmount,
+    this.settlementId,
   });
 
   String get formattedOrderDate => THelperFunctions.getFormattedDate(orderDate);
@@ -64,6 +86,7 @@ class OrderModel {
     return {
       'id': id,
       'userId': userId,
+      'company_id': companyId,
       'status': status.toString(), // Enum to string
       'totalAmount': totalAmount,
       'shippingCost': shippingCost,
@@ -75,8 +98,34 @@ class OrderModel {
       'deliveryDate': deliveryDate,
       'billingAddressSameAsShipping': billingAddressSameAsShipping,
       'items': items.map((item) => item.toJson()).toList(), // Convert CartItemModel to map
-      'coupon': coupon
+      'coupon': coupon,
+      'subtotal': subtotal,
+      'discount_amount': discountAmount,
+      'reward_amount': rewardAmount,
+      'total': total ?? totalAmount,
+      'payment_status': paymentStatus.name,
+      'fulfillment_status': fulfillmentStatus.name,
+      'commission_rate': commissionRate,
+      'commission_amount': commissionAmount,
+      'company_amount': companyAmount,
+      'settlement_id': settlementId,
     };
+  }
+
+  static PaymentStatus _paymentStatusFrom(dynamic value) {
+    final raw = value?.toString();
+    return PaymentStatus.values.firstWhere(
+      (e) => e.name == raw,
+      orElse: () => PaymentStatus.pending,
+    );
+  }
+
+  static FulfillmentStatus _fulfillmentStatusFrom(dynamic value) {
+    final raw = value?.toString();
+    return FulfillmentStatus.values.firstWhere(
+      (e) => e.name == raw,
+      orElse: () => FulfillmentStatus.pending,
+    );
   }
 
   static DateTime? _parseDate(dynamic value) {
@@ -92,6 +141,7 @@ class OrderModel {
       docId: docId ?? data['docId']?.toString() ?? '',
       id: data.containsKey('id') ? data['id'] as String : '',
       userId: data.containsKey('userId') ? data['userId'] as String : '',
+        companyId: data['company_id']?.toString() ?? data['CompanyId']?.toString(),
       status: data.containsKey('status')
           ? OrderStatus.values.firstWhere((e) => e.toString() == data['status'], orElse: () => OrderStatus.pending)
           : OrderStatus.pending,
@@ -111,6 +161,16 @@ class OrderModel {
       items: data.containsKey('items')
           ? (data['items'] as List<dynamic>).map((itemData) => CartItemModel.fromJson(itemData as Map<String, dynamic>)).toList()
           : [],
+      subtotal: data['subtotal'] != null ? (data['subtotal'] as num).toDouble() : null,
+      discountAmount: data['discount_amount'] != null ? (data['discount_amount'] as num).toDouble() : null,
+      rewardAmount: data['reward_amount'] != null ? (data['reward_amount'] as num).toDouble() : null,
+      total: data['total'] != null ? (data['total'] as num).toDouble() : null,
+      paymentStatus: _paymentStatusFrom(data['payment_status']),
+      fulfillmentStatus: _fulfillmentStatusFrom(data['fulfillment_status']),
+      commissionRate: data['commission_rate'] != null ? (data['commission_rate'] as num).toDouble() : null,
+      commissionAmount: data['commission_amount'] != null ? (data['commission_amount'] as num).toDouble() : null,
+      companyAmount: data['company_amount'] != null ? (data['company_amount'] as num).toDouble() : null,
+      settlementId: data['settlement_id']?.toString(),
     );
   }
 

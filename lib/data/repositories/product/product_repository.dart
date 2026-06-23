@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/supabase/supabase_client.dart';
+import '../../../features/personalization/controllers/user_controller.dart';
+import '../../../utils/constants/enums.dart';
 
 import '../../../features/shop/models/product_model.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
@@ -19,10 +21,22 @@ class ProductRepository extends GetxController {
   static const String _productsTable = 'products';
   static const String _productCategoryTable = 'product_categories';
 
+  String? get _currentCompanyId {
+    return UserController.instance.user.value.companyId;
+  }
+
+  bool get _isCompanyAdmin {
+    return UserController.instance.user.value.role == AppRole.companyAdmin;
+  }
+
   /* ---------------------------- FUNCTIONS ---------------------------------*/
 
   /// Create product.
   Future<String> createProduct(ProductModel product) async {
+    if (_isCompanyAdmin) {
+      return createMyProduct(product);
+    }
+
     try {
       final row = await supabase.from(_productsTable).insert({'data': product.toJson()}).select().single();
       return row['id'].toString();
@@ -73,6 +87,10 @@ class ProductRepository extends GetxController {
 
   /// Update product.
   Future<void> updateProduct(ProductModel product) async {
+    if (_isCompanyAdmin) {
+      return updateMyProduct(product);
+    }
+
     try {
       await supabase.from(_productsTable).upsert({'id': product.id, 'data': product.toJson()});
       return;
@@ -120,6 +138,10 @@ class ProductRepository extends GetxController {
 
   /// Get limited featured products.
   Future<List<ProductModel>> getAllProducts() async {
+    if (_isCompanyAdmin) {
+      return getMyProducts();
+    }
+
     try {
       final rows = await supabase.from(_productsTable).select();
       final result = (rows as List)
@@ -201,6 +223,10 @@ class ProductRepository extends GetxController {
 
   /// Delete product
   Future<void> deleteProduct(ProductModel product) async {
+    if (_isCompanyAdmin) {
+      return deleteMyProduct(product.id);
+    }
+
     try {
       await supabase.from(_productCategoryTable).delete().eq('product_id', product.id);
       await supabase.from(_productsTable).delete().eq('id', product.id);
@@ -240,5 +266,71 @@ class ProductRepository extends GetxController {
     } catch (e) {
       throw 'Something went wrong. Please try again';
     }
+  }
+
+  Future<String> createMyProduct(ProductModel product) async {
+    final companyId = _currentCompanyId;
+    if (companyId == null || companyId.isEmpty) {
+      throw 'Tu cuenta no tiene una empresa asociada.';
+    }
+
+    final json = product.toJson()..['CompanyId'] = companyId;
+    final row = await supabase
+        .from(_productsTable)
+        .insert({'data': json, 'company_id': companyId})
+        .select('id')
+        .single();
+
+    return row['id'].toString();
+  }
+
+  Future<List<ProductModel>> getMyProducts() async {
+    final companyId = _currentCompanyId;
+    if (companyId == null || companyId.isEmpty) {
+      return [];
+    }
+
+    final rows = await supabase
+        .from(_productsTable)
+        .select('id, data, company_id, created_at')
+        .eq('company_id', companyId)
+        .order('created_at', ascending: false);
+
+    return (rows as List)
+        .map((e) => flattenRow(Map<String, dynamic>.from(e)))
+        .map((json) => ProductModel.fromJson(json, id: json['id']?.toString()))
+        .toList();
+  }
+
+  Future<void> updateMyProduct(ProductModel product) async {
+    final companyId = _currentCompanyId;
+    if (companyId == null || companyId.isEmpty) {
+      throw 'Tu cuenta no tiene una empresa asociada.';
+    }
+
+    final json = product.toJson()..['CompanyId'] = companyId;
+    await supabase
+        .from(_productsTable)
+        .update({'data': json})
+        .eq('id', product.id)
+        .eq('company_id', companyId);
+  }
+
+  Future<void> deleteMyProduct(String id) async {
+    final companyId = _currentCompanyId;
+    if (companyId == null || companyId.isEmpty) {
+      throw 'Tu cuenta no tiene una empresa asociada.';
+    }
+
+    await supabase
+        .from(_productCategoryTable)
+        .delete()
+        .eq('product_id', id);
+
+    await supabase
+        .from(_productsTable)
+        .delete()
+        .eq('id', id)
+        .eq('company_id', companyId);
   }
 }

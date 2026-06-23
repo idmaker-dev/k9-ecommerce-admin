@@ -18,7 +18,7 @@ class OrderInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OrderController());
-    controller.orderStatus.value = order.status;
+    controller.orderStatus.value = order.fulfillmentStatus;
     return TRoundedContainer(
       padding: const EdgeInsets.all(TSizes.defaultSpace),
       child: Column(
@@ -59,16 +59,16 @@ class OrderInfo extends StatelessWidget {
                           radius: TSizes.cardRadiusSm,
                           padding: const EdgeInsets.symmetric(horizontal: TSizes.sm, vertical: 0),
                           backgroundColor: THelperFunctions.getOrderStatusColor(controller.orderStatus.value).withOpacity(0.1),
-                          child: DropdownButton<OrderStatus>(
+                          child: DropdownButton<FulfillmentStatus>(
                             padding: const EdgeInsets.symmetric(vertical: 0),
                             value: controller.orderStatus.value,
-                            onChanged: (OrderStatus? newValue) {
+                            onChanged: (FulfillmentStatus? newValue) {
                               if (newValue != null) {
                                 controller.updateOrderStatus(order, newValue);
                               }
                             },
-                            items: OrderStatus.values.map((OrderStatus status) {
-                              return DropdownMenuItem<OrderStatus>(
+                            items: FulfillmentStatus.values.map((FulfillmentStatus status) {
+                              return DropdownMenuItem<FulfillmentStatus>(
                                 value: status,
                                 child: Text(
                                   status.name.capitalize.toString(),
@@ -79,6 +79,10 @@ class OrderInfo extends StatelessWidget {
                           ),
                         );
                       },
+                    ),
+                    Text(
+                      'Pago: ${order.paymentStatus.name.capitalize}',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
                 ),

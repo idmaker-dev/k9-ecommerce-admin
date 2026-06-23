@@ -11,16 +11,22 @@ class THelperFunctions {
     return DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day, 0, 0, 0, 0, 0);
   }
 
-  static Color getOrderStatusColor(OrderStatus value) {
-    if (OrderStatus.pending == value) {
+  static Color getOrderStatusColor(dynamic value) {
+    final raw = value is FulfillmentStatus
+        ? value.name
+        : value is OrderStatus
+            ? value.name
+            : value?.toString();
+
+    if (raw == 'pending') {
       return Colors.blue;
-    } else if (OrderStatus.processing == value) {
+    } else if (raw == 'processing' || raw == 'preparing') {
       return Colors.orange;
-    } else if (OrderStatus.shipped == value) {
+    } else if (raw == 'shipped') {
       return Colors.purple;
-    } else if (OrderStatus.delivered == value) {
+    } else if (raw == 'delivered') {
       return Colors.green;
-    } else if (OrderStatus.cancelled == value) {
+    } else if (raw == 'cancelled') {
       return Colors.red;
     } else {
       return Colors.grey;

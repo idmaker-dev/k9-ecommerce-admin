@@ -18,6 +18,7 @@ import '../../../../utils/popups/loaders.dart';
 import '../../../data/repositories/media/media_repository.dart';
 import '../../../utils/constants/image_strings.dart';
 import '../../../utils/constants/sizes.dart';
+import '../../personalization/controllers/user_controller.dart';
 import '../screens/media/widgets/media_content.dart';
 
 /// Controller for managing media operations
@@ -249,7 +250,12 @@ class MediaController extends GetxController {
         path = TTexts.categoriesStoragePath;
         break;
       case MediaCategory.productos:
-        path = TTexts.productsStoragePath;
+        final user = UserController.instance.user.value;
+        if (user.role == AppRole.companyAdmin && (user.companyId?.isNotEmpty ?? false)) {
+          path = '${TTexts.productsStoragePath}/${user.companyId}';
+        } else {
+          path = TTexts.productsStoragePath;
+        }
         break;
       case MediaCategory.usuarios:
         path = TTexts.usersStoragePath;

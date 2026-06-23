@@ -29,6 +29,11 @@ class TRoutes {
 
   static const orders = '/pedidos';
   static const orderDetails = '/pedidoDetalles';
+  static const myProducts = '/misProductos';
+
+  static const inventory = '/inventario';
+  static const settlements = '/liquidaciones';
+  static const auditLogs = '/auditoria';
 
   static const coupons = '/cupons';
   static const createCoupon = '/crearCupones';
@@ -43,10 +48,14 @@ class TRoutes {
     dashboard,
     media,
     products,
+    myProducts,
     categories,
     brands,
     customers,
     orders,
+    inventory,
+    settlements,
+    auditLogs,
     coupons,
     settings,
     profile,

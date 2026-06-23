@@ -1,4 +1,5 @@
 import 'package:cwt_ecommerce_admin_panel/features/personalization/controllers/settings_controller.dart';
+import 'package:cwt_ecommerce_admin_panel/features/personalization/controllers/user_controller.dart';
 import 'package:cwt_ecommerce_admin_panel/utils/constants/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -62,21 +63,40 @@ class TSidebar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text('MENU', style: Theme.of(context).textTheme.bodySmall!.apply(letterSpacingDelta: 1.2)),
-                    // Menu Items
-                    const TMenuItem(route: TRoutes.dashboard, icon: Iconsax.status, itemName: 'Panel'),
-                    const TMenuItem(route: TRoutes.media, icon: Iconsax.image, itemName: 'Multimedia'),
-                    const TMenuItem(route: TRoutes.banners, icon: Iconsax.picture_frame, itemName: 'Banners'),
-                    const TMenuItem(route: TRoutes.products, icon: Iconsax.shopping_bag, itemName: 'Productos'),
-                    const TMenuItem(route: TRoutes.categories, icon: Iconsax.category_2, itemName: 'Categorias'),
-                    const TMenuItem(route: TRoutes.brands, icon: Iconsax.dcube, itemName: 'Marcas'),
-                    const TMenuItem(route: TRoutes.customers, icon: Iconsax.profile_2user, itemName: 'Clientes'),
-                    const TMenuItem(route: TRoutes.orders, icon: Iconsax.box, itemName: 'Pedidos'),
-                    const TMenuItem(route: TRoutes.coupons, icon: Iconsax.code, itemName: 'Cupones'),
+                    Obx(() {
+                      final role = UserController.instance.user.value.role;
+                      final isOperator = role == AppRole.admin;
+                      final isCompanyAdmin = role == AppRole.companyAdmin;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const TMenuItem(route: TRoutes.dashboard, icon: Iconsax.status, itemName: 'Panel'),
+                          if (isOperator) ...[
+                            const TMenuItem(route: TRoutes.media, icon: Iconsax.image, itemName: 'Multimedia'),
+                            const TMenuItem(route: TRoutes.banners, icon: Iconsax.picture_frame, itemName: 'Banners'),
+                          ],
+                          isCompanyAdmin ? const TMenuItem(route: TRoutes.myProducts, icon: Iconsax.shopping_bag, itemName: 'Mis productos') : const TMenuItem(route: TRoutes.products, icon: Iconsax.shopping_bag, itemName: 'Productos'),
+                          if (isOperator) ...[
+                            const TMenuItem(route: TRoutes.categories, icon: Iconsax.category_2, itemName: 'Categorias'),
+                            const TMenuItem(route: TRoutes.brands, icon: Iconsax.dcube, itemName: 'Marcas'),
+                            const TMenuItem(route: TRoutes.customers, icon: Iconsax.profile_2user, itemName: 'Clientes'),
+                          ],
+                          const TMenuItem(route: TRoutes.orders, icon: Iconsax.box, itemName: 'Pedidos'),
+                          const TMenuItem(route: TRoutes.inventory, icon: Iconsax.box_tick, itemName: 'Inventario'),
+                          const TMenuItem(route: TRoutes.settlements, icon: Iconsax.money_recive, itemName: 'Liquidaciones'),
+                          const TMenuItem(route: TRoutes.auditLogs, icon: Iconsax.document_text, itemName: 'Auditoría'),
+                          if (isOperator) const TMenuItem(route: TRoutes.coupons, icon: Iconsax.code, itemName: 'Cupones'),
+                        ],
+                      );
+                    }),
                     const SizedBox(height: TSizes.spaceBtwItems),
                     Text('OTROS', style: Theme.of(context).textTheme.bodySmall!.apply(letterSpacingDelta: 1.2)),
                     // Other menu items
                     const TMenuItem(route: TRoutes.profile, icon: Iconsax.user, itemName: 'Perfil'),
-                    const TMenuItem(route: TRoutes.settings, icon: Iconsax.setting_2, itemName: 'Configuración'),
+                    Obx(() => UserController.instance.user.value.role == AppRole.admin
+                        ? const TMenuItem(route: TRoutes.settings, icon: Iconsax.setting_2, itemName: 'Configuración')
+                        : const SizedBox.shrink()),
                     const TMenuItem(route: 'logout', icon: Iconsax.logout, itemName: 'Salir'),
                   ],
                 ),

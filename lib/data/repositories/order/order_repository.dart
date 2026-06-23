@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/supabase/supabase_client.dart';
 
 import '../../../features/shop/models/order_model.dart';
+import '../../../utils/constants/enums.dart';
 import '../../../utils/exceptions/firebase_exceptions.dart';
 import '../../../utils/exceptions/format_exceptions.dart';
 import '../../../utils/exceptions/platform_exceptions.dart';
@@ -21,7 +22,12 @@ class OrderRepository extends GetxController {
   // Get all orders related to the current user
   Future<List<OrderModel>> getAllOrders(String coupon) async {
     try {
-      final rows = await supabase.from(_ordersTable).select().eq('coupon', coupon).order('order_date', ascending: false);
+      dynamic query = supabase.from(_ordersTable).select('*').order('created_at', ascending: false);
+      if (coupon.isNotEmpty) {
+        query = query.eq('coupon', coupon);
+      }
+
+      final rows = await query;
       return (rows as List)
           .map((e) => flattenRow(Map<String, dynamic>.from(e)))
           .map((json) => OrderModel.fromJson(json))
@@ -113,5 +119,12 @@ class OrderRepository extends GetxController {
     } catch (e) {
       throw 'Something went wrong. Please try again';
     }
+  }
+
+  Future<void> updateFulfillmentStatus(String orderId, FulfillmentStatus status) async {
+    await supabase
+        .from(_ordersTable)
+        .update({'fulfillment_status': status.name})
+        .eq('id', orderId);
   }
 }

@@ -4,6 +4,10 @@ final supabase = Supabase.instance.client;
 
 Map<String, dynamic> flattenRow(Map<String, dynamic> row) {
   final data = Map<String, dynamic>.from(row['data'] ?? {});
-  data['id'] = row['id'];
+  row.forEach((key, value) {
+    if (key != 'data') {
+      data[key] = value;
+    }
+  });
   return data;
 }

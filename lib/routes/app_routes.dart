@@ -9,10 +9,14 @@ import 'package:cwt_ecommerce_admin_panel/features/shop/screens/category/create_
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/category/edit_category/edit_category.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/coupon/all_coupons/coupons.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/customer/all_customers/customers.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/screens/inventory/inventory.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/order/all_orders/orders.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/order/orders_detail/order_detail.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/product/create_product/create_product.dart';
 import 'package:cwt_ecommerce_admin_panel/features/shop/screens/product/edit_product/edit_product.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/screens/product/my_products.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/screens/settlement/settlements.dart';
+import 'package:cwt_ecommerce_admin_panel/features/shop/screens/audit/audit_logs.dart';
 import 'package:get/get.dart';
 import '../features/authentication/screens/forget_password/forget_password.dart';
 import '../features/authentication/screens/login/login.dart';
@@ -43,6 +47,7 @@ class TAppRoute {
     GetPage(name: TRoutes.products, page: () => const ProductsScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.createProduct, page: () => const CreateProductScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.editProduct, page: () => const EditProductScreen(), middlewares: [TRouteMiddleware()]),
+    GetPage(name: TRoutes.myProducts, page: () => const MyProductsScreen(), middlewares: [TRouteMiddleware()]),
 
     // Categories
     GetPage(name: TRoutes.categories, page: () => const CategoriesScreen(), middlewares: [TRouteMiddleware()]),
@@ -50,11 +55,6 @@ class TAppRoute {
     GetPage(name: TRoutes.editCategory, page: () => const EditCategoryScreen(), middlewares: [TRouteMiddleware()]),
 
     // Brands
-    GetPage(name: TRoutes.brands, page: () => const BrandsScreen(), middlewares: [TRouteMiddleware()]),
-    GetPage(name: TRoutes.createBrand, page: () => const CreateBrandScreen(), middlewares: [TRouteMiddleware()]),
-    GetPage(name: TRoutes.editBrand, page: () => const EditBrandScreen(), middlewares: [TRouteMiddleware()]),
-
-    // Coupons
     GetPage(name: TRoutes.brands, page: () => const BrandsScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.createBrand, page: () => const CreateBrandScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.editBrand, page: () => const EditBrandScreen(), middlewares: [TRouteMiddleware()]),
@@ -67,6 +67,14 @@ class TAppRoute {
     GetPage(name: TRoutes.orders, page: () => const OrdersScreen(), middlewares: [TRouteMiddleware()]),
     GetPage(name: TRoutes.orderDetails, page: () => const OrderDetailScreen(), middlewares: [TRouteMiddleware()]),
 
+    // Inventory
+    GetPage(name: TRoutes.inventory, page: () => const InventoryScreen(), middlewares: [TRouteMiddleware()]),
+
+    // Settlements
+    GetPage(name: TRoutes.settlements, page: () => const SettlementsScreen(), middlewares: [TRouteMiddleware()]),
+
+    // Audit
+    GetPage(name: TRoutes.auditLogs, page: () => const AuditLogsScreen(), middlewares: [TRouteMiddleware()]),
 
     // Coupons
     GetPage(name: TRoutes.coupons, page: () => const CouponsScreen(), middlewares: [TRouteMiddleware()]),
